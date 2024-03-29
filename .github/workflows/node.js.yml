@@ -47,6 +47,7 @@ jobs:
           port: 22
           source: 'itzportfolio-nodejs.tar'
           target: '/tmp'
+          timeout: '3m'
 
       - name: Load and Deploy Docker image on Droplet via SSH
         uses: appleboy/ssh-action@master
@@ -54,6 +55,7 @@ jobs:
           host: ${{ secrets.DIGITALOCEAN_HOST }}
           username: ${{ secrets.DIGITALOCEAN_SSH_USERNAME }}
           key: ${{ secrets.DIGITALOCEAN_SSH_KEY }}
+          timeout: '3m'
           script: |
             docker load < /tmp/itzportfolio-nodejs.tar
             docker stop itzportfolio-container || true
