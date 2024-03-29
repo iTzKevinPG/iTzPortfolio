@@ -4,58 +4,72 @@ on:
   push:
     branches: [main]
 
+# jobs:
+#   build_and_deploy:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v2
+
+#       - name: Install Node.js
+#         uses: actions/setup-node@v1
+#         with:
+#           node-version: '20.x'
+
+#       - name: Clear Cache Dependencies
+#         run: |
+#           npm cache clean --force
+
+#       - name: Install npm dependencies
+#         run: |
+#           npm --version
+#           node --version
+#           npm ci --production
+#           npm install -g @angular/cli@latest
+
+#       - name: Build Angular app
+#         run: |
+#           npm install --save-dev @angular-devkit/build-angular --force
+#           npm run build --configuration=production
+
+#       - name: Build Docker image
+#         run: docker build -t itzportfolio-nodejs .
+
+#       - name: Save Docker image
+#         run: docker save itzportfolio-nodejs > itzportfolio-nodejs.tar
+
+#       - name: Transfer Docker image to Droplet via SCP
+#         uses: appleboy/scp-action@master
+#         with:
+#           host: ${{ secrets.DIGITALOCEAN_HOST }}
+#           username: ${{ secrets.DIGITALOCEAN_SSH_USERNAME }}
+#           key: ${{ secrets.DIGITALOCEAN_SSH_KEY }}
+#           port: 22
+#           source: 'itzportfolio-nodejs.tar'
+#           target: '/tmp'
+
+#       - name: Load and Deploy Docker image on Droplet via SSH
+#         uses: appleboy/ssh-action@master
+#         with:
+#           host: ${{ secrets.DIGITALOCEAN_HOST }}
+#           username: ${{ secrets.DIGITALOCEAN_SSH_USERNAME }}
+#           key: ${{ secrets.DIGITALOCEAN_SSH_KEY }}
+#           script: |
+#             docker load < /tmp/itzportfolio-nodejs.tar
+#             docker stop itzportfolio-container || true
+#             docker rm itzportfolio-container || true
+#             docker run -d --name itzportfolio-container -p 80:80 itzportfolio-nodejs
+
 jobs:
-  build_and_deploy:
+  test_ssh_connection:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Install Node.js
-        uses: actions/setup-node@v1
-        with:
-          node-version: '20.x'
-
-      - name: Clear Cache Dependencies
-        run: |
-          npm cache clean --force
-
-      - name: Install npm dependencies
-        run: |
-          npm --version
-          node --version
-          npm ci --production
-          npm install -g @angular/cli@latest
-
-      - name: Build Angular app
-        run: |
-          npm install --save-dev @angular-devkit/build-angular --force
-          npm run build --configuration=production
-
-      - name: Build Docker image
-        run: docker build -t itzportfolio-nodejs .
-
-      - name: Save Docker image
-        run: docker save itzportfolio-nodejs > itzportfolio-nodejs.tar
-
-      - name: Transfer Docker image to Droplet via SCP
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.DIGITALOCEAN_HOST }}
-          username: ${{ secrets.DIGITALOCEAN_SSH_USERNAME }}
-          key: ${{ secrets.DIGITALOCEAN_SSH_KEY }}
-          port: 22
-          source: 'itzportfolio-nodejs.tar'
-          target: '/tmp'
-
-      - name: Load and Deploy Docker image on Droplet via SSH
+      - name: Test SSH connection
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.DIGITALOCEAN_HOST }}
           username: ${{ secrets.DIGITALOCEAN_SSH_USERNAME }}
           key: ${{ secrets.DIGITALOCEAN_SSH_KEY }}
           script: |
-            docker load < /tmp/itzportfolio-nodejs.tar
-            docker stop itzportfolio-container || true
-            docker rm itzportfolio-container || true
-            docker run -d --name itzportfolio-container -p 80:80 itzportfolio-nodejs
+            echo "Testing SSH connection"
+            ls -la
