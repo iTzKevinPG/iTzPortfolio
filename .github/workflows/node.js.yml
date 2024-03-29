@@ -28,7 +28,9 @@ jobs:
           npm install -g @angular/cli@latest
 
       - name: Build Angular app
-        run: npm run build --configuration=production
+        run: |
+          npm install --save-dev @angular-devkit/build-angular --force
+          npm run build --configuration=production
 
       - name: Build Docker image
         run: docker build -t itzportfolio-nodejs .
