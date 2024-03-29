@@ -1,0 +1,43 @@
+@import 'variables.scss';
+
+:root {
+	--white: #{map-get($colors, white)};
+	--black: #{map-get($colors, black)};
+	--black-chinese: #{map-get($colors, black-chinese)};
+	--dark-charcoal-gray: #{map-get($colors, dark-charcoal-gray)};
+	--charcoal-gray: #{map-get($colors, charcoal-gray)};
+	--silver-american: #{map-get($colors, silver-american)};
+	--gray-philippine: #{map-get($colors, gray-philippine)};
+	--main-purple: #{map-get($colors, main-purple)};
+	--royal-purple: #{map-get($colors, royal-purple)};
+	--dark-charcoal-gray-10: #{map-get($colors, dark-charcoal-gray)};
+	--dark-bg-10: #{map-get($colors, dark-bg-10)};
+	--reddish-orange: #{map-get($colors, reddish-orange)};
+	--golden-yellow: #{map-get($colors, golden-yellow)};
+	--green-sea: #{map-get($colors, green-sea)};
+	--turquoise: #{map-get($colors, turquoise)};
+
+	--color-contrast-lower: hsl(from var(--main-purple) h 6% 15%);
+	--color-contrast-low: hsl(from var(--main-purple) h 4% 25%);
+	--color-contrast-medium: hsl(from var(--main-purple) h 1% 57%);
+	--color-contrast-high: hsl(from var(--main-purple) h 0% 89%);
+	--color-contrast-higher: white;
+
+	--surface-0: hsl(from var(--main-purple) h 10% 15%);
+	--surface-1: hsl(from var(--main-purple) h 10% 10%);
+	--surface-2: hsl(from var(--main-purple) h 10% 15%);
+	--surface-3: hsl(from var(--main-purple) h 10% 20%);
+	--surface-4: hsl(from var(--main-purple) h 10% 25%);
+	--surface-5: hsl(from var(--main-purple) h 10% 35%);
+
+	--text-color: var(--color-contrast-high);
+	--text-color-placeholder: hsl(from var(--text-color) h s l / 80%);
+	--text-primary-color: var(--main-purple);
+	--text-secondary-color: var(--royal-purple);
+
+	--success-color: var(--turquoise);
+	--valid-color: var(--green-sea);
+	--error-color: var(--reddish-orange);
+	--warning-color: var(--golden-yellow);
+	--info-color: var(--royal-purple);
+}

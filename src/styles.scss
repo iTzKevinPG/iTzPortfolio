@@ -1,1 +1,37 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('@assets/styles/_variables.scss');
+@import url('@assets/styles/_root.scss');
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0px;
+	position: relative;
+	overflow: -moz-hidden-unscrollable;
+	height: -webkit-fill-available;
+}
+
+::-webkit-scrollbar {
+	border-radius: 1rem;
+	width: 5px;
+}
+
+::-webkit-scrollbar-track {
+	border-radius: 1rem;
+	background: var(--surface-0);
+	margin-top: 3rem;
+	margin-bottom: 3rem;
+}
+
+::-webkit-scrollbar-thumb {
+	border-radius: 1rem;
+	background: var(--surface-3);
+}
+
+::-webkit-scrollbar-thumb:hover {
+	border-radius: 1rem;
+	background: var(--surface-4);
+}
