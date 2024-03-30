@@ -6,9 +6,5 @@ export const routes: Routes = [
 		path: 'home',
 		loadComponent: () => import('@pages/home/home.component').then((c) => c.HomeComponent)
 	},
-	{
-		path: 'shell',
-		loadChildren: () => import('@features/shell/config/dashboard.routes').then((c) => c.routes)
-	},
 	{ path: '**', redirectTo: 'home' }
 ];
