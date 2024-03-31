@@ -1,6 +1,57 @@
 <app-background></app-background>
 <div class="main-container">
-	<h1>Portafolio</h1>
-	<p>home works!</p>
-	<h6>V 1.0</h6>
+	<div class="main-container__header">
+		<div class="main-container__header--section">
+			<div class="main-container__header--title">
+				<h2>Hola, soy Kevin Useche 👋</h2>
+				<h1>Full Stack Developer<span>!</span></h1>
+				<h2>Apasionado por la tecnología y el desarrollo de software👾.</h2>
+			</div>
+			<div class="main-container__header--avatar">
+				<img src="../../../assets/img/foto-avatar.webp" alt="avatar" />
+				<p>😎</p>
+			</div>
+		</div>
+		<div class="main-container__header--section">
+			<div class="main-container__header--slogan">
+				<h3>"Sí puedes <span>imaginarlo</span>, puedes <span>programarlo</span>"</h3>
+			</div>
+		</div>
+	</div>
+	<div class="main-container__row">
+		<div class="main-container__row--links">
+			<div class="main-container__row--description">
+				<h3>
+					Me encanta <span>aprender</span> cosas nuevas y enfrentar <span>desafíos</span>. En mi rol como
+					<span>Full Stack Developer</span> cuento experiencia en tecnologías como Angular, .Net, Java, AWS, SQL Server,
+					entre otras. Quienes interactúan conmigo y/o aprenden de mi consideran que soy un buen <span>líder</span> o
+					<span>profesor</span>. Si tienes un proyecto en mente, no dudes en <span>contactarme</span>.
+				</h3>
+			</div>
+			<a class="main-container__row--btn" (click)="openLink('cv')">
+				<span>CV Resume</span>
+			</a>
+			<div class="main-container__row--social">
+				<div
+					class="main-container__row--social-item"
+					style="
+						-webkit-mask: url('../../../assets/icons/linkedin.svg') no-repeat center;
+						mask: url('../../../assets/icons/linkedin.svg') no-repeat center;
+					"
+					(click)="openLink('in')"
+				></div>
+				<div
+					class="main-container__row--social-item"
+					style="
+						-webkit-mask: url('../../../assets/icons/git-small.svg') no-repeat center;
+						mask: url('../../../assets/icons/git-small.svg') no-repeat center;
+					"
+					(click)="openLink('git')"
+				></div>
+			</div>
+		</div>
+	</div>
+	<div class="main-container__row">
+		<h1>Proyectos</h1>
+	</div>
 </div>

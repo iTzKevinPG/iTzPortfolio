@@ -30,6 +30,8 @@
 	--surface-4: hsl(from var(--main-purple) h 10% 25%);
 	--surface-5: hsl(from var(--main-purple) h 10% 35%);
 
+	--blur-surface-1: hsl(from var(--surface-1) h s l / 50%);
+
 	--text-color: var(--color-contrast-high);
 	--text-color-placeholder: hsl(from var(--text-color) h s l / 80%);
 	--text-primary-color: var(--main-purple);
@@ -40,4 +42,11 @@
 	--error-color: var(--reddish-orange);
 	--warning-color: var(--golden-yellow);
 	--info-color: var(--royal-purple);
+
+	// font
+	--font-family: 'Roboto', sans-serif;
+	--font-size-lg: 2.5rem;
+	--font-size-md: 1.25rem;
+	--font-size-sm: 1rem;
+	--font-size-xs: 0.783rem;
 }

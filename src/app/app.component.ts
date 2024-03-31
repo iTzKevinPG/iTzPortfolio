@@ -17,6 +17,6 @@ export class AppComponent implements OnInit {
 		this.loader.showLoader();
 		setTimeout(() => {
 			this.loader.hideLoader();
-		}, 2000);
+		}, 1000);
 	}
 }
