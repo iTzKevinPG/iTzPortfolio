@@ -28,7 +28,7 @@
 					<span>profesor</span>. Si tienes un proyecto en mente, no dudes en <span>contactarme</span>.
 				</h3>
 			</div>
-			<a class="main-container__row--btn" (click)="openLink('cv')">
+			<a class="main-container__row--btn" (click)="openLink('cv')" (keydown)="(false)" tabindex="0">
 				<span>CV Resume</span>
 			</a>
 			<div class="main-container__row--social">
@@ -39,6 +39,8 @@
 						mask: url('../../../assets/icons/linkedin.svg') no-repeat center;
 					"
 					(click)="openLink('in')"
+					(keydown)="(false)"
+					tabindex="0"
 				></div>
 				<div
 					class="main-container__row--social-item"
@@ -47,6 +49,8 @@
 						mask: url('../../../assets/icons/git-small.svg') no-repeat center;
 					"
 					(click)="openLink('git')"
+					(keydown)="(false)"
+					tabindex="0"
 				></div>
 			</div>
 		</div>
