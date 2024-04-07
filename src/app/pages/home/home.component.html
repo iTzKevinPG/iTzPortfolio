@@ -1,10 +1,10 @@
 <app-background></app-background>
 <div class="main-container">
-	<div class="main-container__header">
+	<div class="main-container__header" [@slideInOutLeft]>
 		<div class="main-container__header--section">
 			<div class="main-container__header--title">
 				<h2>Hola, soy Kevin Useche 👋</h2>
-				<h1>Full Stack Developer<span>!</span></h1>
+				<h1>Full Stack Developer<span> !</span></h1>
 				<h2>Apasionado por la tecnología y el desarrollo de software👾.</h2>
 			</div>
 			<div class="main-container__header--avatar">
@@ -18,13 +18,13 @@
 			</div>
 		</div>
 	</div>
-	<div class="main-container__row">
+	<div class="main-container__row" [@slideInOutRight]>
 		<div class="main-container__row--links">
 			<div class="main-container__row--description">
 				<h3>
 					Me encanta <span>aprender</span> cosas nuevas y enfrentar <span>desafíos</span>. En mi rol como
 					<span>Full Stack Developer</span> cuento experiencia en tecnologías como Angular, .Net, Java, AWS, SQL Server,
-					entre otras. Quienes interactúan conmigo y/o aprenden de mi consideran que soy un buen <span>líder</span> o
+					entre otras. Quienes interactúan conmigo y/o aprenden de mi, consideran que soy un buen <span>líder</span> o
 					<span>profesor</span>. Si tienes un proyecto en mente, no dudes en <span>contactarme</span>.
 				</h3>
 			</div>
@@ -55,7 +55,17 @@
 			</div>
 		</div>
 	</div>
-	<div class="main-container__row">
-		<h1>Proyectos</h1>
+	<div class="main-container__row" [@slideInOut]>
+		<app-projects></app-projects>
+	</div>
+	<div class="main-container__row" [@slideInOut]>
+		<div class="main-container__row--title">
+			<h1>Skills<span> !</span></h1>
+			<p>
+				Estas son algunas de las <span>tecnologías</span> y <span>herramientas</span> que conozco, que he usado para
+				realizar mi <span>trabajo</span> dia a dia.
+			</p>
+		</div>
+		<app-skills></app-skills>
 	</div>
 </div>

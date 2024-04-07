@@ -16,6 +16,8 @@
 	--golden-yellow: #{map-get($colors, golden-yellow)};
 	--green-sea: #{map-get($colors, green-sea)};
 	--turquoise: #{map-get($colors, turquoise)};
+	--riskment: #{map-get($colors, riskment)};
+	--pirani: #{map-get($colors, pirani)};
 
 	--color-contrast-lower: hsl(from var(--main-purple) h 6% 15%);
 	--color-contrast-low: hsl(from var(--main-purple) h 4% 25%);
