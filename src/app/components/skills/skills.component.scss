@@ -29,6 +29,10 @@
 				}
 			}
 		}
+
+		@media (width <= 780px) {
+			width: calc(100% - 1rem);
+		}
 	}
 
 	&--section-full {
