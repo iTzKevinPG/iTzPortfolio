@@ -2,13 +2,14 @@ import { animate, style, transition, trigger } from '@angular/animations';
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { BackgroundComponent } from '../../components/background/background.component';
-import { ProjectsComponent } from '../../components/projects/projects.component';
+import { ExperiencesComponent } from '../../components/experiences/experiences.component';
 import { SkillsComponent } from '../../components/skills/skills.component';
+import { ProjectsComponent } from '../../components/projects/projects.component';
 
 @Component({
 	selector: 'app-home',
 	standalone: true,
-	imports: [CommonModule, BackgroundComponent, ProjectsComponent, SkillsComponent],
+	imports: [CommonModule, BackgroundComponent, ExperiencesComponent, SkillsComponent, ProjectsComponent],
 	templateUrl: './home.component.html',
 	styleUrl: './home.component.scss',
 	animations: [
@@ -36,7 +37,8 @@ export class HomeComponent {
 	links: { [key: string]: string } = {
 		['cv']: 'https://drive.google.com/file/d/164XeeSSt13x7djqbxHrIFwzGuDvOV50x/view?usp=sharing',
 		['in']: 'https://www.linkedin.com/in/iitzcopkevinii/',
-		['git']: 'https://github.com/iTzKevinPG'
+		['git']: 'https://github.com/iTzKevinPG',
+		['rec']: 'https://drive.google.com/file/d/1KB3hV4iiHr1KauKO4HCy1MAwGqC191qd/view?usp=sharing'
 	};
 
 	openLink(url: string) {

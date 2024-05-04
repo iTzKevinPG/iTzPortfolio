@@ -6,6 +6,20 @@
 	overflow: hidden;
 
 	&__card {
+		&--title {
+			& h1 {
+				color: var(--text-secondary-color);
+				font-size: var(--font-size-lg);
+				font-weight: 500;
+				line-height: 1.5;
+
+				& span {
+					color: var(--text-color);
+				}
+			}
+			margin-bottom: 0.5rem;
+		}
+
 		&--container {
 			width: 100%;
 			gap: var(--global-separation);
@@ -51,7 +65,7 @@
 					font-weight: 450;
 
 					&.r {
-						color: #6b6ed4;
+						color: var(--riskment);
 					}
 
 					&.p {
@@ -121,7 +135,7 @@
 			}
 
 			&.e {
-				background-image: linear-gradient(to top, var(--royal-purple) 0%, #453a94 100%);
+				background-image: linear-gradient(to top, #f43b47 0%, #c32a34 100%);
 			}
 
 			&.b {

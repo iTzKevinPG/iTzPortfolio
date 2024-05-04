@@ -10,6 +10,7 @@
 	overflow: auto;
 	user-select: none;
 	font-family: var(--font-family);
+	padding-top: 5rem;
 
 	&__header {
 		display: flex;
@@ -20,7 +21,6 @@
 		background: var(--blur-surface-1);
 		border-radius: var(--global-border-radius);
 		backdrop-filter: blur(0.2rem);
-		margin-top: 5rem;
 		color: var(--text-color);
 		gap: var(--global-separation);
 
@@ -184,6 +184,11 @@
 			cursor: pointer;
 			border-radius: var(--global-border-radius);
 
+			&.lg {
+				width: 12rem;
+				min-width: 12rem;
+			}
+
 			&::before,
 			&::after {
 				content: '';
@@ -277,6 +282,13 @@
 
 		&:last-child {
 			margin-bottom: 5rem;
+		}
+
+		&--recomendation {
+			margin: 1rem 0;
+			display: flex;
+			justify-content: center;
+			align-items: center;
 		}
 
 		@media (width <= 1140px) {

@@ -56,7 +56,7 @@
 		</div>
 	</div>
 	<div class="main-container__row" [@slideInOut]>
-		<app-projects></app-projects>
+		<app-experiences></app-experiences>
 	</div>
 	<div class="main-container__row" [@slideInOut]>
 		<div class="main-container__row--title">
@@ -67,5 +67,24 @@
 			</p>
 		</div>
 		<app-skills></app-skills>
+	</div>
+	<div class="main-container__row" [@slideInOut]>
+		<div class="main-container__row--title">
+			<h1>Extras<span> !</span></h1>
+			<p>
+				Esta es una <span>recomendación</span> de mi ultimo trabajo, donde <span>destacan</span> un poco de mis
+				fortalezas y habilidades que como <span>trabajador</span> lo consideran de valor.
+			</p>
+			<div class="main-container__row--recomendation">
+				<a class="main-container__row--btn lg" (click)="openLink('rec')" (keydown)="(false)" tabindex="0">
+					<span>Recomendación Pirani</span>
+				</a>
+			</div>
+			<p>
+				También puedes ver algunos de mis <span>proyectos</span> en github, estos proyectos son de mayor
+				<span>importancia</span> para mi, en cuanto a experiencia o nuevos <span>conocimientos</span> se trata.
+			</p>
+		</div>
+		<app-projects></app-projects>
 	</div>
 </div>
