@@ -71,6 +71,10 @@
 					&.p {
 						color: var(--pirani);
 					}
+
+					&.j {
+						color: #007dc3;
+					}
 				}
 			}
 
@@ -140,6 +144,10 @@
 
 			&.b {
 				background-image: linear-gradient(to top, #453a94 0%, #342a80 100%);
+			}
+
+			&.a {
+				background-image: linear-gradient(to right, #342a80 0%, #f43b47 50%, #ff9900 100%);
 			}
 		}
 
