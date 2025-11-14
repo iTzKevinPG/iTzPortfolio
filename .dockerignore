@@ -1,0 +1,10 @@
+.git
+.gitignore
+.vscode
+node_modules
+dist
+tmp
+.angular/cache
+npm-debug.log
+yarn-error.log
+coverage

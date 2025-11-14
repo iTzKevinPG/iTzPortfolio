@@ -1,28 +1,43 @@
-# Step 1: We build the angular app using the production config
-FROM node:latest as build
+# syntax=docker/dockerfile:1.6
+
+ARG NODE_VERSION=20
+
+# Stage 1: build the Angular app
+FROM node:${NODE_VERSION}-alpine AS build
 WORKDIR /app
-# Copy the package.json and package-lock.json files
+
+# Copy lockfiles first for better caching
 COPY package*.json ./
-# Run a clean install of the dependencies
+
+# Install dependencies needed for the build
 RUN npm ci
-# Install Angular CLI globally
-RUN npm install -g @angular/cli
-# Copy all files
+
+# Copy the rest of the source
 COPY . .
-# Build the application
-RUN npm run build --configuration=production
 
-# Step 2: We use the nginx image to serve the application
-FROM nginx:latest
+# Allow overriding the Angular base href at build time
+ARG APP_BASE_HREF=/
+ENV APP_BASE_HREF=${APP_BASE_HREF}
 
-# Copy the build output to replace the default nginx contents.
-COPY ./nginx.conf /etc/nginx/conf.d/default.conf
+# Build using the provided base href
+RUN npm run build -- --configuration production --base-href ${APP_BASE_HREF}
 
-# Copy the build output to replace the default nginx contents.
+# Stage 2: serve the compiled assets with nginx
+FROM nginx:1.25-alpine
+
+ENV PORT=8080 \
+    SERVER_NAME=_ \
+    NGINX_ENVSUBST_TEMPLATE_SUFFIX=.template \
+    NGINX_ENVSUBST_OUTPUT_DIR=/etc/nginx/conf.d
+
+# Template for nginx that will be rendered with envsubst on container start
+COPY nginx.conf /etc/nginx/templates/default.conf.template
+
+# Copy the Angular build output
 COPY --from=build /app/dist/i-tz-portfolio/browser /usr/share/nginx/html
 
-# Expose port 80
-EXPOSE 80
+# Expose the internal port used by nginx
+EXPOSE 8080
 
-# Build: docker build -t itzportfolio-nodejs .
-# Run: docker run -d -p 8080:80 itzportfolio-nodejs
+# Build: docker build -t itzportfolio .
+# Run (local test): docker run -d -p 8080:8080 -e PORT=8080 itzportfolio
