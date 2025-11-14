@@ -9,19 +9,20 @@ export class LoaderService {
 	private isLoadingSubject = new BehaviorSubject<boolean>(false);
 	isLoading$ = this.isLoadingSubject.asObservable();
 
-	constructor() {}
-
-	showLoader() {
-		if (this.apiCount === 0) {
-			this.isLoadingSubject.next(false);
-		}
+	showLoader(): void {
 		this.apiCount++;
+		if (this.apiCount === 1) {
+			this.isLoadingSubject.next(true);
+		}
 	}
 
-	hideLoader() {
+	hideLoader(): void {
+		if (this.apiCount === 0) {
+			return;
+		}
 		this.apiCount--;
 		if (this.apiCount === 0) {
-			this.isLoadingSubject.next(true);
+			this.isLoadingSubject.next(false);
 		}
 	}
 }

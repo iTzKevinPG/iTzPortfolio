@@ -8,7 +8,7 @@ import { Component, OnInit } from '@angular/core';
 	styleUrl: './skills.component.scss'
 })
 export class SkillsComponent implements OnInit {
-	cloneAndAppendSlides() {
+	private cloneAndAppendSlides(): void {
 		const slideElements = document.querySelectorAll('.skills-container__logos-slide');
 
 		slideElements.forEach((slideElement) => {

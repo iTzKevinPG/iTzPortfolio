@@ -13,7 +13,7 @@ import { LoaderService } from '../shared/services/loader.service';
 export class AppComponent implements OnInit {
 	constructor(private loader: LoaderService) {}
 
-	ngOnInit() {
+	ngOnInit(): void {
 		this.loader.showLoader();
 		setTimeout(() => {
 			this.loader.hideLoader();

@@ -29,13 +29,11 @@ export class BackgroundComponent implements OnInit {
 
 	items: string[] = [];
 
-	constructor() {}
-
-	getRandomImg() {
+	private getRandomImg(): string {
 		return this.images[Math.floor(Math.random() * Object.keys(this.images).length) + 1];
 	}
 
-	ngOnInit() {
+	ngOnInit(): void {
 		this.items = Array.from({ length: 12 }, () => this.getRandomImg() ?? 'kevin');
 	}
 }

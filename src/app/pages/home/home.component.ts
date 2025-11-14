@@ -41,7 +41,7 @@ export class HomeComponent {
 		['rec']: 'https://drive.google.com/file/d/1KB3hV4iiHr1KauKO4HCy1MAwGqC191qd/view?usp=sharing'
 	};
 
-	openLink(url: string) {
+	openLink(url: string): void {
 		window.open(this.links[url], '_blank');
 	}
 }
