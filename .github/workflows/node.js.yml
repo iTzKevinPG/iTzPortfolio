@@ -8,7 +8,6 @@ env:
   NODE_VERSION: 20
   IMAGE_NAME: itzportfolio
   REGISTRY: ghcr.io
-  REGISTRY_IMAGE: ghcr.io/${{ github.repository_owner }}/itzportfolio
   APP_BASE_HREF: ${{ vars.APP_BASE_HREF || '/' }}
   TRAEFIK_NETWORK: ${{ vars.TRAEFIK_NETWORK }}
 
@@ -51,8 +50,10 @@ jobs:
       - name: Prepare image metadata
         id: meta
         run: |
+          owner_lower=$(echo "${GITHUB_REPOSITORY_OWNER}" | tr '[:upper:]' '[:lower:]')
+          image_uri="${REGISTRY}/${owner_lower}/${IMAGE_NAME}"
           echo "image_tag=${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
-          echo "image_uri=${REGISTRY_IMAGE}" >> "$GITHUB_OUTPUT"
+          echo "image_uri=${image_uri}" >> "$GITHUB_OUTPUT"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -69,8 +70,8 @@ jobs:
           docker buildx build \
             --platform linux/amd64 \
             --build-arg APP_BASE_HREF=${{ env.APP_BASE_HREF }} \
-            -t ${{ env.REGISTRY_IMAGE }}:${{ steps.meta.outputs.image_tag }} \
-            -t ${{ env.REGISTRY_IMAGE }}:latest \
+            -t ${{ steps.meta.outputs.image_uri }}:${{ steps.meta.outputs.image_tag }} \
+            -t ${{ steps.meta.outputs.image_uri }}:latest \
             --push .
 
   deploy:
