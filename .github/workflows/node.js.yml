@@ -88,7 +88,7 @@ jobs:
           port: ${{ secrets.DO_SSH_PORT }}
           script: |
             set -euo pipefail
-            cat <<'EOF' >/opt/platform/.env.platform
+            cat <<'EOF' >/opt/platform/.env
             TRAEFIK_ACME_EMAIL=${{ secrets.TRAEFIK_ACME_EMAIL }}
             TRAEFIK_NETWORK=${{ vars.TRAEFIK_NETWORK || 'reverse-proxy' }}
             PORTFOLIO_HOST=${{ vars.PORTFOLIO_HOST }}
