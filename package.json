@@ -5,12 +5,9 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
-    "build:ssg": "npm run prerender",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "lint": "ng lint",
-    "prerender": "ng build --configuration production --prerender",
-    "serve:ssr:iTzPortfolio": "node dist/i-tz-portfolio/server/server.mjs"
+    "lint": "ng lint"
   },
   "private": true,
   "dependencies": {

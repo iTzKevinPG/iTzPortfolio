@@ -1,106 +1,62 @@
-name: Build and Deploy iTzPortfolio
+name: Build and Deploy Angular App to DigitalOcean Droplet
 
 on:
   push:
     branches: [main]
 
-env:
-  NODE_VERSION: 20
-  IMAGE_NAME: itzportfolio
-  REGISTRY: ghcr.io
-  APP_BASE_HREF: ${{ vars.APP_BASE_HREF || '/' }}
-  TRAEFIK_NETWORK: ${{ vars.TRAEFIK_NETWORK }}
-
 jobs:
-  build_package_push:
-    name: Build · Test · Package · Push
+  build_and_deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-    outputs:
-      image_tag: ${{ steps.meta.outputs.image_tag }}
-      image_uri: ${{ steps.meta.outputs.image_uri }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Use Node.js ${{ env.NODE_VERSION }}
+      - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: '20'
           cache: npm
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Clear npm cache
+        run: npm cache clean --force
 
-      - name: Lint (test phase)
-        run: npm run lint
-
-      - name: Build prerendered Angular app
-        run: npm run prerender -- --base-href ${{ env.APP_BASE_HREF }}
-
-      - name: Upload dist artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist
-          path: dist
-          retention-days: 7
-
-      - name: Prepare image metadata
-        id: meta
+      - name: Install npm dependencies
         run: |
-          owner_lower=$(echo "${GITHUB_REPOSITORY_OWNER}" | tr '[:upper:]' '[:lower:]')
-          image_uri="${REGISTRY}/${owner_lower}/${IMAGE_NAME}"
-          echo "image_tag=${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
-          echo "image_uri=${image_uri}" >> "$GITHUB_OUTPUT"
+          npm --version
+          node --version
+          npm ci
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - name: Build Angular app
+        run: npm run build -- --configuration=production
 
-      - name: Log in to GHCR
-        uses: docker/login-action@v3
+      - name: Build Docker image
+        run: docker build -t itzportfolio-nodejs .
+
+      - name: Save Docker image
+        run: docker save itzportfolio-nodejs > itzportfolio-nodejs.tar
+
+      - name: Transfer Docker image to Droplet via SCP
+        uses: appleboy/scp-action@v0.1.7
         with:
-          registry: ghcr.io
-          username: ${{ secrets.REGISTRY_USERNAME }}
-          password: ${{ secrets.REGISTRY_TOKEN }}
+          host: ${{ secrets.DO_HOST }}
+          username: ${{ secrets.DO_SSH_USER }}
+          key: ${{ secrets.DO_SSH_KEY }}
+          port: 22
+          source: itzportfolio-nodejs.tar
+          target: /tmp
+          timeout: 3m
 
-      - name: Build and push image
-        run: |
-          docker buildx build \
-            --platform linux/amd64 \
-            --build-arg APP_BASE_HREF=${{ env.APP_BASE_HREF }} \
-            -t ${{ steps.meta.outputs.image_uri }}:${{ steps.meta.outputs.image_tag }} \
-            -t ${{ steps.meta.outputs.image_uri }}:latest \
-            --push .
-
-  deploy:
-    name: Deploy to Droplet
-    needs: build_package_push
-    runs-on: ubuntu-latest
-    steps:
-      - name: Trigger remote deployment
+      - name: Load and Deploy Docker image on Droplet via SSH
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.DO_HOST }}
           username: ${{ secrets.DO_SSH_USER }}
           key: ${{ secrets.DO_SSH_KEY }}
-          port: ${{ secrets.DO_SSH_PORT }}
+          port: 22
+          timeout: 3m
           script: |
             set -euo pipefail
-            cat <<'EOF' >/opt/platform/.env
-            TRAEFIK_ACME_EMAIL=${{ secrets.TRAEFIK_ACME_EMAIL }}
-            TRAEFIK_NETWORK=${{ vars.TRAEFIK_NETWORK || 'reverse-proxy' }}
-            PORTFOLIO_HOST=${{ vars.PORTFOLIO_HOST || secrets.PORTFOLIO_HOST }}
-            PORTFOLIO_IMAGE=${{ vars.PORTFOLIO_IMAGE || format('{0}/{1}/{2}:latest', env.REGISTRY, github.repository_owner, env.IMAGE_NAME) }}
-            PORTFOLIO_INTERNAL_PORT=${{ vars.PORTFOLIO_INTERNAL_PORT || '8080' }}
-            CF_DNS_API_TOKEN=${{ secrets.CF_DNS_API_TOKEN }}
-            DOCKER_API_VERSION=${{ vars.DOCKER_API_VERSION || '1.45' }}
-            EOF
-            cp /opt/platform/.env /opt/platform/.env.platform
-
-            echo "${{ secrets.REGISTRY_TOKEN }}" | docker login ghcr.io -u "${{ secrets.REGISTRY_USERNAME }}" --password-stdin
-            cd /opt/platform
-            docker network inspect ${{ vars.TRAEFIK_NETWORK || 'reverse-proxy' }} >/dev/null 2>&1 || docker network create ${{ vars.TRAEFIK_NETWORK || 'reverse-proxy' }}
-            docker compose --project-name ${{ secrets.COMPOSE_PROJECT }} pull portfolio
-            docker compose --project-name ${{ secrets.COMPOSE_PROJECT }} up -d portfolio
+            docker load < /tmp/itzportfolio-nodejs.tar
+            docker stop itzportfolio-container || true
+            docker rm itzportfolio-container || true
+            docker run -d --name itzportfolio-container -p 80:80 itzportfolio-nodejs

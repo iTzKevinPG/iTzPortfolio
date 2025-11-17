@@ -17,8 +17,8 @@ Este repositorio contiene el código de mi landing personal **itzkevindev.tech**
 | ------------------- | --------------------------------------------------------------------------- |
 | `npm start`         | Servidor local de desarrollo (`ng serve`).                                  |
 | `npm run build`     | Build estándar (SPA) usando la configuración activa en `angular.json`.      |
-| `npm run prerender` | Compila y prerenderiza las rutas SSG (`dist/i-tz-portfolio/prerender`).     |
-| `npm run build:ssg` | Alias del comando anterior para pipelines/containers.                       |
+| `npm run prerender` | (Opcional) compila y prerenderiza rutas SSG para pruebas locales.           |
+| `npm run build:ssg` | Alias del comando anterior.                                                 |
 | `npm run test`      | Pruebas unitarias con Karma + Jasmine.                                      |
 | `npm run lint`      | Linter mediante `@angular-eslint`.                                          |
 
@@ -32,16 +32,16 @@ npm start
 
 ## Docker 🐳
 
-El `Dockerfile` compila Angular (Node 20 Alpine), ejecuta `npm run prerender` y sirve el contenido
-estático con Nginx 1.25 Alpine (gzip + Brotli habilitados por defecto).
+El `Dockerfile` compila Angular (Node 20 Alpine) como SPA y sirve el contenido
+estático con Nginx 1.25 Alpine (gzip habilitado).
 
 - `APP_BASE_HREF` (build arg, default `/`): ajusta el base href si se sirve bajo un subpath.
-- `PORT` (env, default `8080`): puerto interno donde escucha Nginx.
+- `PORT` (env, default `80`): puerto interno donde escucha Nginx.
 - `SERVER_NAME` (env, default `_`): se inyecta en `server_name` por si necesitas logging/host matching.
 
 ```bash
 docker build -t itzportfolio --build-arg APP_BASE_HREF=/ .
-docker run -d --rm -p 8080:8080 -e PORT=8080 -e SERVER_NAME=itzkevindev.tech itzportfolio
+docker run -d --rm -p 80:80 -e PORT=80 -e SERVER_NAME=itzkevindev.tech itzportfolio
 ```
 
 ## Verificación
@@ -49,41 +49,33 @@ docker run -d --rm -p 8080:8080 -e PORT=8080 -e SERVER_NAME=itzkevindev.tech itz
 ```bash
 npm run lint
 npm run test
-npm run prerender           # genera dist/i-tz-portfolio/{browser,prerender}
-npx http-server dist/i-tz-portfolio/prerender -p 4201   # smoke test estático
+npm run build -- --configuration production
+npx http-server dist/i-tz-portfolio/browser -p 4201   # smoke test estático
 ```
 
 ## Pipeline CI/CD 🚢
 
 ### Resumen del flujo
 
-1. **Build**: `npm ci`, `npm run lint`, `npm run prerender -- --base-href ${APP_BASE_HREF}`.
-2. **Artefacto**: `dist/` (browser + prerender) se guarda 7 días para inspección/rollback manual.
-3. **Imagen Docker**: `docker buildx build` con `APP_BASE_HREF` desde variables del repo, etiqueta `ghcr.io/itzkevinpg/itzportfolio:{sha|latest}` y push a GHCR usando `REGISTRY_USERNAME`/`REGISTRY_TOKEN`.
-4. **Deploy**: `appleboy/ssh-action` entra al droplet, hace `docker compose --project-name platform_portfolio pull/up portfolio` en `/opt/platform`.
+1. **Build**: `npm ci`, `npm run lint`, `npm run build -- --configuration production`.
+2. **Imagen Docker**: `docker build -t itzportfolio-nodejs .` empaqueta el SPA con Nginx.
+3. **Entrega**: la imagen se exporta (`docker save`) y se transfiere al droplet vía `scp`.
+4. **Deploy**: `appleboy/ssh-action` carga la imagen, detiene el contenedor previo y lanza `docker run -d -p 80:80 itzportfolio-nodejs`.
 
 ### Secrets / variables usados
 
 | Tipo     | Nombre              | Descripción                                                                 |
 | -------- | ------------------- | --------------------------------------------------------------------------- |
-| Secret   | `REGISTRY_USERNAME` | Usuario de GitHub con acceso a GHCR.                                        |
-| Secret   | `REGISTRY_TOKEN`    | PAT con scopes `read:packages` y `write:packages`.                          |
-| Secret   | `DO_HOST`           | IP pública del droplet.                                                     |
-| Secret   | `DO_SSH_USER`       | Usuario SSH (actualmente `root`).                                           |
-| Secret   | `DO_SSH_KEY`        | Clave privada OpenSSH para el droplet.                                      |
-| Secret   | `DO_SSH_PORT`       | Puerto SSH (22).                                                            |
-| Secret   | `COMPOSE_PROJECT`   | Nombre del proyecto Compose (`platform_portfolio`).                         |
-| Variable | `APP_BASE_HREF`     | Base href usado en el build (por defecto `/`).                              |
-| Variable | `TRAEFIK_NETWORK`   | Nombre de la red externa compartida (`reverse-proxy`).                      |
+| Secret   | `DO_HOST`         | IP pública del droplet destino.                                         |
+| Secret   | `DO_SSH_USERNAME` | Usuario SSH (ej. `root` o `deploy`).                                    |
+| Secret   | `DO_SSH_KEY`      | Clave privada OpenSSH para el droplet.                                  |
+| Variable | `APP_BASE_HREF`             | Base href usado en el build (por defecto `/`).                          |
 
-### Infraestructura actual (provisional)
+### Infraestructura actual
 
-- Droplet Docker (1 vCPU / 1 GB) con carpeta `/opt/platform`.
-- Red externa Docker `reverse-proxy`.
-- `docker-compose.yml` minimal con:
-  - `traefik` (entradas 80/443, certificados Let’s Encrypt).
-  - `portfolio` apuntando a `ghcr.io/itzkevinpg/itzportfolio:latest`, labels Traefik para `itzkevindev.tech`, y `.env.portfolio` con `PORT=8080`, `SERVER_NAME=itzkevindev.tech`.
-- Pipeline GitHub Actions despliega directamente contra este stack mientras preparamos el repo de plataforma/Terraform.
+- Droplet Docker pequeño (1 vCPU / 1 GB) que expone el puerto 80.
+- Un único contenedor `itzportfolio-container` manejado por el workflow (stop/remove/run).
+- El pipeline GitHub Actions reconstruye y reemplaza ese contenedor en cada push a `main`.
 
 ---
 
