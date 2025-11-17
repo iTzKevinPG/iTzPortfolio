@@ -19,11 +19,13 @@ COPY . .
 ARG APP_BASE_HREF=/
 ENV APP_BASE_HREF=${APP_BASE_HREF}
 
-# Build using the provided base href
-RUN npm run build -- --configuration production --base-href ${APP_BASE_HREF}
+# Build using the provided base href and prerender the routes
+RUN npm run prerender -- --base-href ${APP_BASE_HREF}
 
 # Stage 2: serve the compiled assets with nginx
 FROM nginx:1.25-alpine
+
+RUN apk add --no-cache nginx-mod-http-brotli brotli
 
 ENV PORT=8080 \
     SERVER_NAME=_ \
@@ -33,8 +35,9 @@ ENV PORT=8080 \
 # Template for nginx that will be rendered with envsubst on container start
 COPY nginx.conf /etc/nginx/templates/default.conf.template
 
-# Copy the Angular build output
+# Copy browser assets first, then overlay the prerendered HTML
 COPY --from=build /app/dist/i-tz-portfolio/browser /usr/share/nginx/html
+COPY --from=build /app/dist/i-tz-portfolio/prerender /usr/share/nginx/html
 
 # Expose the internal port used by nginx
 EXPOSE 8080

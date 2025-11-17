@@ -37,8 +37,8 @@ jobs:
       - name: Lint (test phase)
         run: npm run lint
 
-      - name: Build Angular app
-        run: npm run build -- --configuration production
+      - name: Build prerendered Angular app
+        run: npm run prerender -- --base-href ${{ env.APP_BASE_HREF }}
 
       - name: Upload dist artifact
         uses: actions/upload-artifact@v4

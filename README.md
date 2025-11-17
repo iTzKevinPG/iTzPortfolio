@@ -13,12 +13,14 @@ Este repositorio contiene el código de mi landing personal **itzkevindev.tech**
 
 ## Scripts principales ⚙️
 
-| Script          | Descripción                                      |
-| --------------- | ------------------------------------------------ |
-| `npm start`     | Servidor local de desarrollo (`ng serve`).       |
-| `npm run build` | Build de producción (`angular.json`).            |
-| `npm run test`  | Pruebas unitarias con Karma + Jasmine.           |
-| `npm run lint`  | Linter mediante `@angular-eslint`.               |
+| Script              | Descripción                                                                 |
+| ------------------- | --------------------------------------------------------------------------- |
+| `npm start`         | Servidor local de desarrollo (`ng serve`).                                  |
+| `npm run build`     | Build estándar (SPA) usando la configuración activa en `angular.json`.      |
+| `npm run prerender` | Compila y prerenderiza las rutas SSG (`dist/i-tz-portfolio/prerender`).     |
+| `npm run build:ssg` | Alias del comando anterior para pipelines/containers.                       |
+| `npm run test`      | Pruebas unitarias con Karma + Jasmine.                                      |
+| `npm run lint`      | Linter mediante `@angular-eslint`.                                          |
 
 ## Desarrollo local 💻
 
@@ -30,7 +32,8 @@ npm start
 
 ## Docker 🐳
 
-El `Dockerfile` compila Angular (Node 20 Alpine) y sirve los artefactos con Nginx 1.25 Alpine.
+El `Dockerfile` compila Angular (Node 20 Alpine), ejecuta `npm run prerender` y sirve el contenido
+estático con Nginx 1.25 Alpine (gzip + Brotli habilitados por defecto).
 
 - `APP_BASE_HREF` (build arg, default `/`): ajusta el base href si se sirve bajo un subpath.
 - `PORT` (env, default `8080`): puerto interno donde escucha Nginx.
@@ -41,12 +44,21 @@ docker build -t itzportfolio --build-arg APP_BASE_HREF=/ .
 docker run -d --rm -p 8080:8080 -e PORT=8080 -e SERVER_NAME=itzkevindev.tech itzportfolio
 ```
 
+## Verificación
+
+```bash
+npm run lint
+npm run test
+npm run prerender           # genera dist/i-tz-portfolio/{browser,prerender}
+npx http-server dist/i-tz-portfolio/prerender -p 4201   # smoke test estático
+```
+
 ## Pipeline CI/CD 🚢
 
 ### Resumen del flujo
 
-1. **Build**: `npm ci`, `npm run lint`, `npm run build --configuration production`.
-2. **Artefacto**: `dist/` se guarda 7 días para inspección/rollback manual.
+1. **Build**: `npm ci`, `npm run lint`, `npm run prerender -- --base-href ${APP_BASE_HREF}`.
+2. **Artefacto**: `dist/` (browser + prerender) se guarda 7 días para inspección/rollback manual.
 3. **Imagen Docker**: `docker buildx build` con `APP_BASE_HREF` desde variables del repo, etiqueta `ghcr.io/itzkevinpg/itzportfolio:{sha|latest}` y push a GHCR usando `REGISTRY_USERNAME`/`REGISTRY_TOKEN`.
 4. **Deploy**: `appleboy/ssh-action` entra al droplet, hace `docker compose --project-name platform_portfolio pull/up portfolio` en `/opt/platform`.
 

@@ -1,22 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { SpinnerComponent } from '../shared/components/spinner/spinner.component';
-import { LoaderService } from '../shared/services/loader.service';
 
 @Component({
 	selector: 'app-root',
 	standalone: true,
-	imports: [RouterOutlet, SpinnerComponent],
+	imports: [RouterOutlet],
 	templateUrl: './app.component.html',
-	styleUrl: './app.component.scss'
+	styleUrl: './app.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AppComponent implements OnInit {
-	constructor(private loader: LoaderService) {}
-
-	ngOnInit(): void {
-		this.loader.showLoader();
-		setTimeout(() => {
-			this.loader.hideLoader();
-		}, 1000);
-	}
-}
+export class AppComponent {}

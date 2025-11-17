@@ -1,10 +1,12 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, Inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { BackgroundComponent } from '../../components/background/background.component';
 import { ExperiencesComponent } from '../../components/experiences/experiences.component';
 import { SkillsComponent } from '../../components/skills/skills.component';
 import { ProjectsComponent } from '../../components/projects/projects.component';
+import { PLATFORM_ID } from '@angular/core';
 
 @Component({
 	selector: 'app-home',
@@ -41,7 +43,13 @@ export class HomeComponent {
 		['rec']: 'https://drive.google.com/file/d/1KB3hV4iiHr1KauKO4HCy1MAwGqC191qd/view?usp=sharing'
 	};
 
+	constructor(@Inject(PLATFORM_ID) private readonly platformId: object) {}
+
 	openLink(url: string): void {
-		window.open(this.links[url], '_blank');
+		if (!this.links[url] || !isPlatformBrowser(this.platformId)) {
+			return;
+		}
+
+		window.open(this.links[url], '_blank', 'noopener');
 	}
 }

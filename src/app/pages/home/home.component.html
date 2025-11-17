@@ -1,5 +1,5 @@
-<app-background></app-background>
-<div class="main-container">
+﻿<app-background></app-background>
+<div class="main-container hydrated-fade">
 	<div class="main-container__header" [@slideInOutLeft]>
 		<div class="main-container__header--section">
 			<div class="main-container__header--title">
@@ -8,7 +8,19 @@
 				<h2>Apasionado por la tecnología y el desarrollo de software👾.</h2>
 			</div>
 			<div class="main-container__header--avatar">
-				<img src="assets/img/foto-avatar-home.webp" alt="avatar" />
+				<picture>
+					<source srcset="assets/img/foto-avatar-home.avif" type="image/avif" />
+					<source srcset="assets/img/foto-avatar-home.webp" type="image/webp" />
+					<img
+						src="assets/img/foto-avatar-home.webp"
+						alt="Retrato de Kevin Useche"
+						width="4634"
+						height="4634"
+						decoding="async"
+						fetchpriority="high"
+						loading="eager"
+					/>
+				</picture>
 				<p>😎</p>
 			</div>
 		</div>
