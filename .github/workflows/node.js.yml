@@ -91,12 +91,13 @@ jobs:
             cat <<'EOF' >/opt/platform/.env
             TRAEFIK_ACME_EMAIL=${{ secrets.TRAEFIK_ACME_EMAIL }}
             TRAEFIK_NETWORK=${{ vars.TRAEFIK_NETWORK || 'reverse-proxy' }}
-            PORTFOLIO_HOST=${{ vars.PORTFOLIO_HOST }}
+            PORTFOLIO_HOST=${{ vars.PORTFOLIO_HOST || secrets.PORTFOLIO_HOST }}
             PORTFOLIO_IMAGE=${{ vars.PORTFOLIO_IMAGE || format('{0}/{1}/{2}:latest', env.REGISTRY, github.repository_owner, env.IMAGE_NAME) }}
             PORTFOLIO_INTERNAL_PORT=${{ vars.PORTFOLIO_INTERNAL_PORT || '8080' }}
             CF_DNS_API_TOKEN=${{ secrets.CF_DNS_API_TOKEN }}
             DOCKER_API_VERSION=${{ vars.DOCKER_API_VERSION || '1.45' }}
             EOF
+            cp /opt/platform/.env /opt/platform/.env.platform
 
             echo "${{ secrets.REGISTRY_TOKEN }}" | docker login ghcr.io -u "${{ secrets.REGISTRY_USERNAME }}" --password-stdin
             cd /opt/platform
