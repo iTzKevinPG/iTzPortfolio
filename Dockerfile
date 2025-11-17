@@ -35,9 +35,8 @@ ENV PORT=8080 \
 # Template for nginx that will be rendered with envsubst on container start
 COPY nginx.conf /etc/nginx/templates/default.conf.template
 
-# Copy browser assets first, then overlay the prerendered HTML
+# Copy prerendered browser assets
 COPY --from=build /app/dist/i-tz-portfolio/browser /usr/share/nginx/html
-COPY --from=build /app/dist/i-tz-portfolio/prerender /usr/share/nginx/html
 
 # Expose the internal port used by nginx
 EXPOSE 8080
