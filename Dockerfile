@@ -25,12 +25,6 @@ RUN npm run prerender -- --base-href ${APP_BASE_HREF}
 # Stage 2: serve the compiled assets with nginx
 FROM nginx:1.25-alpine
 
-RUN apk add --no-cache nginx-mod-http-brotli brotli \
-  && mkdir -p /etc/nginx/modules-enabled \
-  && printf 'load_module modules/ngx_http_brotli_filter_module.so;\nload_module modules/ngx_http_brotli_static_module.so;\n' \
-    > /etc/nginx/modules-enabled/50-brotli.conf \
-  && sed -i '1iinclude /etc/nginx/modules-enabled/*.conf;' /etc/nginx/nginx.conf
-
 ENV PORT=8080 \
     SERVER_NAME=_ \
     NGINX_ENVSUBST_TEMPLATE_SUFFIX=.template \
