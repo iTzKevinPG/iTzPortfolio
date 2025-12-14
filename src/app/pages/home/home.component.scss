@@ -119,10 +119,31 @@
 			line-height: 1.5;
 		}
 
-		@media (width <=1140px) {
+		@media (width <=1400px) {
+			width: 70%;
+		}
+
+		@media (width <=1200px) {
 			width: 80%;
+			padding-left: 3rem;
+			padding-right: 3rem;
+		}
+
+		@media (width <=960px) {
+			width: 88%;
+			padding-left: 2.5rem;
+			padding-right: 2.5rem;
+		}
+
+		@media (width <=720px) {
+			width: 94%;
 			padding-left: 2rem;
 			padding-right: 2rem;
+		}
+
+		@media (width <=540px) {
+			width: 100%;
+			padding: 1.25rem;
 		}
 
 		@media (width <=650px) {
@@ -151,7 +172,7 @@
 		background: var(--blur-surface-1);
 		border-radius: var(--global-border-radius);
 		backdrop-filter: blur(0.2rem);
-		padding-left: 5rem;
+		padding: 1rem 5rem;
 		color: var(--text-color);
 
 		&--title {
@@ -253,6 +274,7 @@
 		}
 
 		&--description {
+			margin: 2rem 0;
 			& h3 {
 				font-size: var(--font-size-sm);
 				font-weight: 400;
@@ -297,16 +319,80 @@
 			align-items: center;
 		}
 
-		@media (width <=1140px) {
+		@media (width <=1400px) {
+			width: 70%;
+		}
+
+		@media (width <=1200px) {
 			width: 80%;
+			padding-left: 3rem;
+			padding-right: 3rem;
+		}
+
+		@media (width <=960px) {
+			width: 88%;
+			padding-left: 2.5rem;
+			padding-right: 2.5rem;
+		}
+
+		@media (width <=720px) {
+			width: 94%;
 			padding-left: 2rem;
 			padding-right: 2rem;
+		}
+
+		@media (width <=540px) {
+			width: 100%;
+			padding: 1.25rem;
 		}
 
 		@media (width <=800px) {
 			&--links {
 				flex-direction: column;
 				gap: var(--global-separation);
+			}
+
+			&--lists {
+				flex-direction: column;
+			}
+		}
+	}
+
+	&__row--lists {
+		display: flex;
+		gap: var(--global-separation);
+		margin-top: 1rem;
+	}
+
+	&__row--list {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		background: var(--blur-surface-1);
+		backdrop-filter: blur(0.2rem);
+		border-radius: var(--global-border-radius);
+		padding: 1rem;
+		-webkit-box-shadow: -5px 5px 15px 0px rgba(0, 0, 0, 0.4);
+		-moz-box-shadow: -5px 5px 15px 0px rgba(0, 0, 0, 0.4);
+		box-shadow: -5px 5px 15px 0px rgba(0, 0, 0, 0.4);
+
+		& h3 {
+			margin: 0;
+			color: var(--text-secondary-color);
+		}
+
+		& ul {
+			margin: 0;
+			padding-left: 1rem;
+
+			& li {
+				line-height: 1.4;
+				color: var(--text-color-placeholder);
+
+				& span {
+					color: var(--text-secondary-color);
+				}
 			}
 		}
 	}

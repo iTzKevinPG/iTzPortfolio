@@ -29,6 +29,7 @@ export class SkillsComponent {
 	backLogos = [
 		{ src: 'assets/icons/java.svg', title: 'Java' },
 		{ src: 'assets/icons/csharp.svg', title: 'C#' },
+		{ src: 'assets/icons/kotlin.svg', title: 'Kotlin' },
 		{ src: 'assets/icons/aws.svg', title: 'AWS Services' },
 		{ src: 'assets/icons/mysql.svg', title: 'MySql' },
 		{ src: 'assets/icons/sql.svg', title: 'Sql Server' }
@@ -38,6 +39,9 @@ export class SkillsComponent {
 		{ src: 'assets/icons/dotnet.svg', title: '.Net' },
 		{ src: 'assets/icons/docker.svg', title: 'Docker' },
 		{ src: 'assets/icons/git.svg', title: 'Git Hub' },
+		{ src: 'assets/icons/gitlab.svg', title: 'GitLab' },
+		{ src: 'assets/icons/azure.svg', title: 'Azure' },
+		{ src: 'assets/icons/kubernetes.svg', title: 'Kubernetes' },
 		{ src: 'assets/icons/vsc.svg', title: 'Visual Studio Code' },
 		{ src: 'assets/icons/vs.svg', title: 'Visual Studio' },
 		{ src: 'assets/icons/workbench.svg', title: 'MySql Workbench' },
@@ -58,8 +62,33 @@ export class SkillsComponent {
 			items: ['Java / Kotlin', 'C# / .NET', 'Node.js', 'REST APIs', 'MySQL', 'SQL Server', 'MongoDB', 'Redis']
 		},
 		{
-			title: 'DevOps & Cloud',
-			items: ['AWS (S3, Cognito, ECS, CloudFront)', 'Docker / Kubernetes', 'Nginx', 'GitHub Actions', 'Scrum / Agile']
+			title: 'Arquitectura',
+			items: [
+				'Arquitectura Hexagonal',
+				'Microservicios (RESTful APIs)',
+				'Monorepos',
+				'Microfrontends (Federation)',
+				'Arquitectura Limpia',
+				'Lineamientos técnicos / C4'
+			]
+		},
+		{
+			title: 'Cloud & DevOps',
+			items: [
+				'AWS (AppSync, Cognito, Serverless, ECS, CloudFormation)',
+				'Azure (App Services, Functions, Storage, DevOps)',
+				'CI/CD (GitLab & GitHub Actions)',
+				'Docker / Kubernetes',
+				'Nginx'
+			]
+		},
+		{
+			title: 'Testing & Mobile',
+			items: ['JUnit / Karma', 'TDD', 'Android (Kotlin)', 'AppSync + Datastore (offline-first)']
+		},
+		{
+			title: 'Productividad',
+			items: ['Git / Jira', 'Codex / MCPs', 'IA Models (apoyo a flujos)']
 		}
 	];
 }

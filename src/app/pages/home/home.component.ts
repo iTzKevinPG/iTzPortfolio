@@ -1,19 +1,17 @@
 import { animate, style, transition, trigger } from '@angular/animations';
-import { CommonModule } from '@angular/common';
-import { Component, Inject } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { Component, Inject, PLATFORM_ID } from '@angular/core';
 import { BackgroundComponent } from '../../components/background/background.component';
 import { ExperiencesComponent } from '../../components/experiences/experiences.component';
-import { SkillsComponent } from '../../components/skills/skills.component';
 import { ProjectsComponent } from '../../components/projects/projects.component';
-import { PLATFORM_ID } from '@angular/core';
+import { SkillsComponent } from '../../components/skills/skills.component';
 
 @Component({
 	selector: 'app-home',
 	standalone: true,
 	imports: [CommonModule, BackgroundComponent, ExperiencesComponent, SkillsComponent, ProjectsComponent],
 	templateUrl: './home.component.html',
-	styleUrl: './home.component.scss',
+	styleUrls: ['./home.component.scss'],
 	animations: [
 		trigger('slideInOut', [
 			transition(':enter', [
