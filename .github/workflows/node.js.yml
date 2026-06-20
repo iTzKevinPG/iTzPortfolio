@@ -1,11 +1,16 @@
-name: Build and Deploy Angular App to DigitalOcean Droplet
+name: CI - Build Angular App
+
+# El despliegue lo realiza Cloudflare Pages directamente desde GitHub.
+# Este workflow solo valida que el proyecto compile en cada push/PR.
 
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
-  build_and_deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -17,46 +22,8 @@ jobs:
           node-version: '20'
           cache: npm
 
-      - name: Clear npm cache
-        run: npm cache clean --force
-
       - name: Install npm dependencies
-        run: |
-          npm --version
-          node --version
-          npm ci
+        run: npm ci
 
       - name: Build Angular app
         run: npm run build -- --configuration=production
-
-      - name: Build Docker image
-        run: docker build -t itzportfolio-nodejs .
-
-      - name: Save Docker image
-        run: docker save itzportfolio-nodejs > itzportfolio-nodejs.tar
-
-      - name: Transfer Docker image to Droplet via SCP
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.DO_HOST }}
-          username: ${{ secrets.DO_SSH_USER }}
-          key: ${{ secrets.DO_SSH_KEY }}
-          port: 22
-          source: itzportfolio-nodejs.tar
-          target: /tmp
-          timeout: 3m
-
-      - name: Load and Deploy Docker image on Droplet via SSH
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.DO_HOST }}
-          username: ${{ secrets.DO_SSH_USER }}
-          key: ${{ secrets.DO_SSH_KEY }}
-          port: 22
-          timeout: 3m
-          script: |
-            set -euo pipefail
-            docker load < /tmp/itzportfolio-nodejs.tar
-            docker stop itzportfolio-container || true
-            docker rm itzportfolio-container || true
-            docker run -d --name itzportfolio-container -p 80:80 itzportfolio-nodejs

@@ -50,7 +50,17 @@
             "assets": [
               "src/favicon.ico",
               "src/assets",
-              "src/assets/i18n"
+              "src/assets/i18n",
+              {
+                "glob": "_redirects",
+                "input": "src",
+                "output": "/"
+              },
+              {
+                "glob": "_headers",
+                "input": "src",
+                "output": "/"
+              }
             ],
             "styles": [
               "src/styles.scss"
