@@ -1,5 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { ExpandableComponent } from '../expandable/expandable.component';
+import { LightboxDirective } from '../../directives/lightbox.directive';
 import { RevealOnScrollDirective } from '../../directives/reveal-on-scroll.directive';
 
 interface ExperienceTech {
@@ -44,7 +46,7 @@ function p(...parts: (string | { h: string })[]): ExperienceSegment[] {
 @Component({
 	selector: 'app-experiences',
 	standalone: true,
-	imports: [CommonModule, RevealOnScrollDirective],
+	imports: [CommonModule, RevealOnScrollDirective, ExpandableComponent, LightboxDirective],
 	templateUrl: './experiences.component.html',
 	styleUrl: './experiences.component.scss'
 })

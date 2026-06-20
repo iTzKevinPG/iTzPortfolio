@@ -21,12 +21,14 @@
 					<h2>
 						<span [class]="exp.accentClass">{{ exp.company }}</span> {{ exp.roleTitle }}
 					</h2>
-					<p *ngFor="let paragraph of exp.paragraphs">
-						<ng-container *ngFor="let seg of paragraph">
-							<span *ngIf="seg.highlight; else plain">{{ seg.text }}</span>
-							<ng-template #plain>{{ seg.text }}</ng-template>
-						</ng-container>
-					</p>
+					<app-expandable>
+						<p *ngFor="let paragraph of exp.paragraphs">
+							<ng-container *ngFor="let seg of paragraph">
+								<span *ngIf="seg.highlight; else plain">{{ seg.text }}</span>
+								<ng-template #plain>{{ seg.text }}</ng-template>
+							</ng-container>
+						</p>
+					</app-expandable>
 				</div>
 				<div class="container__card--technologies">
 					<div class="container__card--technology" *ngFor="let tech of exp.technologies" [style.background-color]="tech.color">
@@ -38,7 +40,7 @@
 				</div>
 			</div>
 
-			<div class="container__card--body-image">
+			<div class="container__card--body-image" appLightbox [lightboxSrc]="exp.image + '.webp'" [lightboxAlt]="exp.alt">
 				<picture>
 					<source [srcset]="exp.image + '.avif'" type="image/avif" />
 					<source [srcset]="exp.image + '.webp'" type="image/webp" />

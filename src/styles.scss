@@ -35,6 +35,11 @@ body {
 	height: -webkit-fill-available;
 }
 
+// Bloquea el scroll de fondo mientras el lightbox está abierto.
+body.lightbox-open .main-container {
+	overflow: hidden;
+}
+
 ::-webkit-scrollbar {
 	border-radius: 1rem;
 	width: 5px;

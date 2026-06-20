@@ -1,5 +1,6 @@
 ﻿<app-background></app-background>
 <app-section-nav [sections]="navSections" [activeId]="activeSectionId()" [trail]="navTrail()"></app-section-nav>
+<app-mobile-progress [sections]="navSections" [activeId]="activeSectionId()" [trail]="navTrail()"></app-mobile-progress>
 <div class="main-container hydrated-fade" (scroll)="onContainerScroll()">
 	<div id="inicio" class="main-container__header" [@slideInOutLeft]>
 		<div class="main-container__header--section">
@@ -137,3 +138,4 @@
 		</div>
 	</div>
 </div>
+<app-lightbox></app-lightbox>

@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { afterNextRender, Component, DestroyRef, inject, signal } from '@angular/core';
 import { BackgroundComponent } from '../../components/background/background.component';
 import { ExperiencesComponent } from '../../components/experiences/experiences.component';
+import { LightboxComponent } from '../../components/lightbox/lightbox.component';
+import { MobileProgressComponent } from '../../components/mobile-progress/mobile-progress.component';
 import { ProjectsComponent } from '../../components/projects/projects.component';
 import { SectionNavComponent, NavSection } from '../../components/section-nav/section-nav.component';
 import { SkillsComponent } from '../../components/skills/skills.component';
@@ -25,6 +27,8 @@ interface Education {
 		SkillsComponent,
 		ProjectsComponent,
 		SectionNavComponent,
+		MobileProgressComponent,
+		LightboxComponent,
 		RevealOnScrollDirective
 	],
 	templateUrl: './home.component.html',

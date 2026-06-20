@@ -3,7 +3,8 @@
 	--global-separation: 1rem;
 
 	font-family: var(--font-family);
-	overflow: hidden;
+	// Sin overflow:hidden: experiencias usa appReveal (no slide), y recortaba los badges
+	// de rol y el glow del nodo del año en los bordes. El layout no desborda en horizontal.
 
 	&__card {
 		&--title {
@@ -105,6 +106,7 @@
 			align-items: center;
 			justify-content: center;
 			width: 100%;
+			cursor: zoom-in;
 
 			& picture,
 			& img {
@@ -118,14 +120,25 @@
 				box-shadow: -5px 5px 15px 0px rgba(0, 0, 0, 0.4);
 				border-radius: var(--global-border-radius);
 			}
+
+			// En móvil: preview de alto consistente (el detalle relevante suele estar arriba).
+			@media (width <=640px) {
+				& img {
+					aspect-ratio: 16 / 10;
+					height: auto;
+					object-fit: cover;
+					object-position: top;
+				}
+			}
 		}
 
 		&--roles {
 			position: absolute;
-			width: 100%;
-			left: 5px;
 			top: -5px;
+			left: 0.5rem;
+			right: 0.5rem;
 			display: flex;
+			flex-wrap: wrap;
 			justify-content: flex-end;
 			gap: 0.5rem;
 		}
@@ -256,10 +269,6 @@
 		writing-mode: vertical-rl;
 		text-orientation: mixed;
 		white-space: nowrap;
-
-		@media (width <=480px) {
-			display: none;
-		}
 	}
 
 	// La experiencia actual (ultima del array) resalta su nodo.
@@ -267,6 +276,52 @@
 		width: 1.1rem;
 		height: 1.1rem;
 		animation: timeline-pulse 2.4s ease-in-out infinite;
+	}
+
+	// Móvil: el rail vertical desperdicia ancho; lo volvemos una fila horizontal
+	// (punto + chip de año) arriba de la tarjeta, y el texto ocupa todo el ancho.
+	@media (width <=640px) {
+		&::before {
+			display: none;
+		}
+
+		&__item {
+			padding-left: 0;
+			padding-bottom: 2.25rem;
+
+			&:last-child {
+				padding-bottom: 0;
+			}
+		}
+
+		&__rail {
+			position: static;
+			flex-direction: row;
+			align-items: center;
+			width: auto;
+			gap: 0.5rem;
+			margin: 0 0 0.4rem;
+		}
+
+		&__node {
+			margin-left: 0;
+			width: 0.7rem;
+			height: 0.7rem;
+		}
+
+		&__item--current &__node {
+			width: 0.85rem;
+			height: 0.85rem;
+		}
+
+		&__period {
+			writing-mode: horizontal-tb;
+			color: var(--text-color);
+			background: hsl(from var(--royal-purple) h s l / 16%);
+			border: 1px solid hsl(from var(--royal-purple) h s l / 30%);
+			border-radius: 1rem;
+			padding: 0.05rem 0.6rem;
+		}
 	}
 }
 

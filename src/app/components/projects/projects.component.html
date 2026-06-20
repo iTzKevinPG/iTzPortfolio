@@ -1,18 +1,20 @@
 <div class="container">
 	<div class="container__card--container">
-		<div class="container__card--body" [@slideInOut]>
+		<div class="container__card--body reveal" appReveal>
 			<div class="container__card--body-container">
 				<div class="container__card--info">
 					<h2><span class="g">FairSplit</span> !</h2>
-					<p>
-						Plataforma para dividir gastos en grupo, con <span>balances al instante</span> y
-						<span>transferencias sugeridas</span>. Nacio para evitar el "quien me debe" y cerrar cuentas sin friccion,
-						ya sea en <span>modo local</span> o con <span>perfil en la nube</span>.
-					</p>
-					<p>
-						Cuide la experiencia en detalle y vista general para cargar la info del evento sin perder contexto, y
-						mejore la visibilidad de <span>balances</span> y <span>pagos sugeridos</span>.
-					</p>
+					<app-expandable>
+						<p>
+							Plataforma para dividir gastos en grupo, con <span>balances al instante</span> y
+							<span>transferencias sugeridas</span>. Nacio para evitar el "quien me debe" y cerrar cuentas sin friccion,
+							ya sea en <span>modo local</span> o con <span>perfil en la nube</span>.
+						</p>
+						<p>
+							Cuide la experiencia en detalle y vista general para cargar la info del evento sin perder contexto, y
+							mejore la visibilidad de <span>balances</span> y <span>pagos sugeridos</span>.
+						</p>
+					</app-expandable>
 					<div class="container__card--technologies">
 						<div class="container__card--technology" style="background-color: #61dafb">React</div>
 						<div class="container__card--technology" style="background-color: #3178c6">TypeScript</div>
@@ -26,7 +28,7 @@
 					<div class="container__card--role e">Personal</div>
 				</div>
 			</div>
-			<div class="container__card--body-image">
+			<div class="container__card--body-image" appLightbox [lightboxSrc]="'assets/img/FairSplit.webp'" [lightboxAlt]="'Interfaz de FairSplit'">
 				<picture>
 					<source srcset="assets/img/FairSplit.avif" type="image/avif" />
 					<source srcset="assets/img/FairSplit.webp" type="image/webp" />
@@ -44,15 +46,17 @@
 
 		<hr />
 
-		<div class="container__card--body" [@slideInOut]>
+		<div class="container__card--body reveal" appReveal>
 			<div class="container__card--body-container">
 				<div class="container__card--info">
 					<h2><span class="j">Juliana</span> Cloud !</h2>
-					<p>
-						Plataforma de nómina en evolución, donde trabajé en <span>microservicios</span> y front <span>Angular</span>
-						para llevar un MVP a un producto robusto con mejor <span>UX</span> y flujos afinados.
-					</p>
-					<p>Refinamos arquitectura, infraestructura y UI/UX para sostener crecimiento y usabilidad.</p>
+					<app-expandable>
+						<p>
+							Plataforma de nómina en evolución, donde trabajé en <span>microservicios</span> y front <span>Angular</span>
+							para llevar un MVP a un producto robusto con mejor <span>UX</span> y flujos afinados.
+						</p>
+						<p>Refinamos arquitectura, infraestructura y UI/UX para sostener crecimiento y usabilidad.</p>
+					</app-expandable>
 					<div class="container__card--technologies">
 						<div class="container__card--technology" style="background-color: #c40935">Angular</div>
 						<div class="container__card--technology" style="background-color: #603493">.NET Core</div>
@@ -66,7 +70,7 @@
 					<div class="container__card--role f">Full Stack</div>
 				</div>
 			</div>
-			<div class="container__card--body-image">
+			<div class="container__card--body-image" appLightbox [lightboxSrc]="'assets/img/Juliana.webp'" [lightboxAlt]="'Interfaz de Juliana Cloud'">
 				<picture>
 					<source srcset="assets/img/Juliana.avif" type="image/avif" />
 					<source srcset="assets/img/Juliana.webp" type="image/webp" />
@@ -84,18 +88,20 @@
 
 		<hr />
 
-		<div class="container__card--body" [@slideInOut]>
+		<div class="container__card--body reveal" appReveal>
 			<div class="container__card--body-container">
 				<div class="container__card--info">
 					<h2><span class="g">Glamping</span> !</h2>
-					<p>
-						Proyecto universitario que plasma la experiencia de un glamping cercano a El Penol (Antioquia). Fue la base
-						para explorar UI/UX y arquitectura lista para evolucionar hacia un producto real.
-					</p>
-					<p>
-						Dirigí el diseño y la construcción del front en <span>React</span> y el back en <span>Go</span>, trabajando
-						con un equipo pequeño y diseños en <span>Figma</span> para validar la propuesta de valor.
-					</p>
+					<app-expandable>
+						<p>
+							Proyecto universitario que plasma la experiencia de un glamping cercano a El Penol (Antioquia). Fue la base
+							para explorar UI/UX y arquitectura lista para evolucionar hacia un producto real.
+						</p>
+						<p>
+							Dirigí el diseño y la construcción del front en <span>React</span> y el back en <span>Go</span>, trabajando
+							con un equipo pequeño y diseños en <span>Figma</span> para validar la propuesta de valor.
+						</p>
+					</app-expandable>
 					<div class="container__card--technologies">
 						<div class="container__card--technology" style="background-color: #61dafb">React Js</div>
 						<div class="container__card--technology" style="background-color: #6ad7e5">Go Lang</div>
@@ -106,7 +112,7 @@
 					<div class="container__card--role c">Coop</div>
 				</div>
 			</div>
-			<div class="container__card--body-image">
+			<div class="container__card--body-image" appLightbox [lightboxSrc]="'assets/img/Glamping.webp'" [lightboxAlt]="'Diseno del proyecto Glamping'">
 				<picture>
 					<source srcset="assets/img/Glamping.avif" type="image/avif" />
 					<source srcset="assets/img/Glamping.webp" type="image/webp" />
@@ -124,19 +130,21 @@
 
 		<hr />
 
-		<div class="container__card--body" [@slideInOut]>
+		<div class="container__card--body reveal" appReveal>
 			<div class="container__card--body-container">
 				<div class="container__card--info">
 					<h2><span class="r">Sismicidad</span> global !</h2>
-					<p>
-						Aplicacion personal que lista la actividad sismica global del ultimo mes con filtros, paginacion e
-						interpretacion de datos en tiempo real.
-					</p>
-					<p>
-						Reforce habilidades de <span>APIs</span>, arquitectura separada front/back y microservicios al usar
-						<span>Ruby on Rails</span> para el back y <span>React</span> para el front con patrones como Redux y Atomic
-						Design.
-					</p>
+					<app-expandable>
+						<p>
+							Aplicacion personal que lista la actividad sismica global del ultimo mes con filtros, paginacion e
+							interpretacion de datos en tiempo real.
+						</p>
+						<p>
+							Reforce habilidades de <span>APIs</span>, arquitectura separada front/back y microservicios al usar
+							<span>Ruby on Rails</span> para el back y <span>React</span> para el front con patrones como Redux y Atomic
+							Design.
+						</p>
+					</app-expandable>
 					<div class="container__card--technologies">
 						<div class="container__card--technology" style="background-color: #c40935">Ruby On Rails</div>
 						<div class="container__card--technology" style="background-color: #0b65a2">React Js</div>
@@ -146,7 +154,7 @@
 					<div class="container__card--role e">Personal</div>
 				</div>
 			</div>
-			<div class="container__card--body-image">
+			<div class="container__card--body-image" appLightbox [lightboxSrc]="'assets/img/ProjectSesismes.webp'" [lightboxAlt]="'Panel de datos sismicos globales'">
 				<picture>
 					<source srcset="assets/img/ProjectSesismes.avif" type="image/avif" />
 					<source srcset="assets/img/ProjectSesismes.webp" type="image/webp" />
@@ -164,18 +172,20 @@
 
 		<hr />
 
-		<div class="container__card--body" [@slideInOut]>
+		<div class="container__card--body reveal" appReveal>
 			<div class="container__card--body-container">
 				<div class="container__card--info">
 					<h2><span class="r">Portafolio</span> Personal !</h2>
-					<p>
-						Sitio que estas visitando. Nacio para mostrar trabajo y sobre todo para experimentar con
-						<span>Angular</span> 17, SSR/SSG y despliegues automatizados en <span>Digital Ocean</span>.
-					</p>
-					<p>
-						Incluye arquitectura limpia, linting, CI/CD hacia contenedores, nginx con gzip/brotli, Traefik y dominio
-						propio. Un laboratorio permanente para mis ideas.
-					</p>
+					<app-expandable>
+						<p>
+							Sitio que estas visitando. Nacio para mostrar trabajo y sobre todo para experimentar con
+							<span>Angular</span> 17, SSR/SSG y despliegues automatizados en <span>Digital Ocean</span>.
+						</p>
+						<p>
+							Incluye arquitectura limpia, linting, CI/CD hacia contenedores, nginx con gzip/brotli, Traefik y dominio
+							propio. Un laboratorio permanente para mis ideas.
+						</p>
+					</app-expandable>
 					<div class="container__card--technologies">
 						<div class="container__card--technology" style="background-color: #c40935">Angular</div>
 						<div class="container__card--technology" style="background-color: #0b65a2">Digital Ocean</div>
@@ -185,7 +195,7 @@
 					<div class="container__card--role e">Personal</div>
 				</div>
 			</div>
-			<div class="container__card--body-image">
+			<div class="container__card--body-image" appLightbox [lightboxSrc]="'assets/img/Portfolio.webp'" [lightboxAlt]="'Portafolio personal de Kevin Useche'">
 				<picture>
 					<source srcset="assets/img/Portfolio.avif" type="image/avif" />
 					<source srcset="assets/img/Portfolio.webp" type="image/webp" />

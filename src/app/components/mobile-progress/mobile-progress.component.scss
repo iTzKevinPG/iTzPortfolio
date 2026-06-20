@@ -1,0 +1,48 @@
+:host {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: 60;
+	display: none; // solo en móvil/tablet (complementa al nav lateral, que es >960px)
+
+	@media (width <=960px) {
+		display: block;
+	}
+}
+
+.mobile-progress {
+	display: flex;
+	flex-direction: column;
+	gap: 0.4rem;
+	padding: calc(env(safe-area-inset-top, 0px) + 0.5rem) 1rem 0.5rem;
+	background: hsl(from var(--surface-1) h s l / 80%);
+	backdrop-filter: blur(0.4rem);
+	border-bottom: 1px solid hsl(from var(--royal-purple) h s l / 18%);
+
+	&__label {
+		font-family: var(--font-family-display);
+		font-size: var(--font-size-xs);
+		font-weight: 600;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		color: var(--text-secondary-color);
+	}
+
+	&__track {
+		position: relative;
+		height: 3px;
+		border-radius: 3px;
+		background: var(--surface-4);
+		overflow: hidden;
+	}
+
+	&__fill {
+		position: absolute;
+		inset: 0;
+		transform-origin: left;
+		border-radius: 3px;
+		background: linear-gradient(90deg, var(--royal-purple), var(--main-purple));
+		transition: transform 0.1s linear;
+	}
+}

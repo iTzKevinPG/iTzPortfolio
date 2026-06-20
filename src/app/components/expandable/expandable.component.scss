@@ -1,0 +1,39 @@
+// El recorte solo aplica en móvil; en desktop el texto se muestra completo.
+@media (width <=640px) {
+	.expandable__content {
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 4;
+		line-clamp: 4;
+		overflow: hidden;
+
+		&.is-expanded {
+			-webkit-line-clamp: unset;
+			line-clamp: unset;
+			overflow: visible;
+		}
+	}
+
+	.expandable__toggle {
+		display: inline-flex;
+	}
+}
+
+.expandable__toggle {
+	display: none; // oculto en desktop
+	align-items: center;
+	margin-top: 0.4rem;
+	padding: 0.35rem 0.1rem;
+	min-height: 44px;
+	background: transparent;
+	border: none;
+	color: var(--text-secondary-color);
+	font-family: var(--font-family-display);
+	font-size: var(--font-size-xs);
+	font-weight: 600;
+	cursor: pointer;
+
+	&:hover {
+		color: var(--text-color);
+	}
+}
