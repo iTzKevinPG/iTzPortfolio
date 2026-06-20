@@ -1,15 +1,17 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { RevealOnScrollDirective } from '../../directives/reveal-on-scroll.directive';
 
 interface HighlightGroup {
 	title: string;
+	accent: string;
 	items: string[];
 }
 
 @Component({
 	selector: 'app-skills',
 	standalone: true,
-	imports: [CommonModule],
+	imports: [CommonModule, RevealOnScrollDirective],
 	templateUrl: './skills.component.html',
 	styleUrl: './skills.component.scss'
 })
@@ -55,14 +57,17 @@ export class SkillsComponent {
 	highlightGroups: HighlightGroup[] = [
 		{
 			title: 'Front-end',
+			accent: '#453a94',
 			items: ['JavaScript / TypeScript', 'Angular (JS / 8+)', 'React', 'RXJs', 'Redux', 'MUI', 'CSS / Sass']
 		},
 		{
 			title: 'Back-end',
+			accent: '#f43b47',
 			items: ['Java / Kotlin', 'C# / .NET', 'Node.js', 'REST APIs', 'MySQL', 'SQL Server', 'MongoDB', 'Redis']
 		},
 		{
 			title: 'Arquitectura',
+			accent: '#a36bfd',
 			items: [
 				'Arquitectura Hexagonal',
 				'Microservicios (RESTful APIs)',
@@ -74,6 +79,7 @@ export class SkillsComponent {
 		},
 		{
 			title: 'Cloud & DevOps',
+			accent: '#2d7dd2',
 			items: [
 				'AWS (AppSync, Cognito, Serverless, ECS, CloudFormation)',
 				'Azure (App Services, Functions, Storage, DevOps)',
@@ -84,10 +90,12 @@ export class SkillsComponent {
 		},
 		{
 			title: 'Testing & Mobile',
+			accent: '#55ad47',
 			items: ['JUnit / Karma', 'TDD', 'Android (Kotlin)', 'AppSync + Datastore (offline-first)']
 		},
 		{
 			title: 'Productividad',
+			accent: '#f27c45',
 			items: ['Git / Jira', 'Codex / MCPs', 'IA Models (apoyo a flujos)']
 		}
 	];

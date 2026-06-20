@@ -53,13 +53,14 @@
 			align-items: flex-start;
 
 			& h2 {
+				font-family: var(--font-family-display);
 				font-size: var(--font-size-md);
-				font-weight: 400;
+				font-weight: 500;
 				line-height: 1.5;
 				margin-bottom: 0.5rem;
 
 				& span {
-					font-weight: 450;
+					font-weight: 600;
 
 					&.r {
 						color: #6b6ed4;

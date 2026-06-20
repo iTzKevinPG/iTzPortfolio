@@ -60,11 +60,17 @@
 	</div>
 
 	<div class="skills-container__highlights">
-		<section class="skills-highlight-card" *ngFor="let group of highlightGroups">
-			<h3>{{ group.title }}</h3>
-			<ul>
-				<li *ngFor="let skill of group.items">{{ skill }}</li>
-			</ul>
+		<section
+			class="skills-highlight-card reveal"
+			*ngFor="let group of highlightGroups; let i = index"
+			appReveal
+			[revealDelay]="i * 80"
+			[style.--accent]="group.accent"
+		>
+			<h3><span class="skills-highlight-card__marker" aria-hidden="true"></span>{{ group.title }}</h3>
+			<div class="skills-highlight-card__chips">
+				<span class="skill-chip" *ngFor="let skill of group.items">{{ skill }}</span>
+			</div>
 		</section>
 	</div>
 </div>

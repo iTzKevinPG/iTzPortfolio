@@ -1,24 +1,83 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
 	<head>
 		<meta charset="utf-8" />
-		<title>ITzPortfolio</title>
+		<title>Kevin Useche · Software Engineer — Backend & Arquitectura</title>
 		<base href="/" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta
 			name="description"
-			content="Portafolio de Kevin Useche, Software Engineer especializado en experiencias web modernas y despliegues cloud."
+			content="Portafolio de Kevin Useche, Software Engineer especializado en backend, arquitectura distribuida y despliegues cloud."
 		/>
+		<link rel="canonical" href="https://www.itzkevindev.tech/home" />
+
+		<!-- Open Graph -->
+		<meta property="og:type" content="profile" />
+		<meta property="og:title" content="Kevin Useche · Software Engineer — Backend & Arquitectura" />
+		<meta
+			property="og:description"
+			content="Software Engineer con +5 años diseñando arquitecturas backend, microservicios y experiencias web que perduran."
+		/>
+		<meta property="og:url" content="https://www.itzkevindev.tech/home" />
+		<meta property="og:image" content="https://www.itzkevindev.tech/assets/img/foto-avatar-home.webp" />
+		<meta property="og:locale" content="es_CO" />
+		<meta property="profile:first_name" content="Kevin" />
+		<meta property="profile:last_name" content="Useche" />
+
+		<!-- Twitter -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content="Kevin Useche · Software Engineer — Backend & Arquitectura" />
+		<meta
+			name="twitter:description"
+			content="Software Engineer con +5 años diseñando arquitecturas backend, microservicios y experiencias web que perduran."
+		/>
+		<meta name="twitter:image" content="https://www.itzkevindev.tech/assets/img/foto-avatar-home.webp" />
+
+		<!-- JSON-LD Person -->
+		<script type="application/ld+json">
+			{
+				"@context": "https://schema.org",
+				"@type": "Person",
+				"name": "Kevin Useche Jimenez",
+				"jobTitle": "Software Engineer",
+				"description": "Software Engineer especializado en backend, arquitectura distribuida y cloud.",
+				"url": "https://www.itzkevindev.tech/home",
+				"image": "https://www.itzkevindev.tech/assets/img/foto-avatar-home.webp",
+				"sameAs": [
+					"https://www.linkedin.com/in/iitzcopkevinii/",
+					"https://github.com/iTzKevinPG"
+				],
+				"knowsAbout": [
+					"Node.js",
+					"Java",
+					".NET",
+					"Kotlin",
+					"Microservicios",
+					"Arquitectura Hexagonal",
+					"AWS",
+					"Azure",
+					"Angular",
+					"React"
+				]
+			}
+		</script>
+
 		<link rel="icon" type="image/x-icon" href="favicon.ico" />
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link
 			rel="preload"
 			as="style"
-			href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
+			href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap"
 		/>
-		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" />
+		<link
+			rel="stylesheet"
+			href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+		/>
 		<style id="critical-css">
+			/* DUPLICADO — mantener en sync con src/assets/styles/_root.scss.
+			   Solo lo imprescindible para el primer paint (hex hardcodeado a proposito
+			   para no depender de hsl(from ...) que no soportan navegadores antiguos). */
 			:root {
 				--main-purple: #440c97;
 				--royal-purple: #a36bfd;
@@ -27,6 +86,7 @@
 				--text-color: #f5f6ff;
 				--text-secondary-color: #cbb5ff;
 				--bg-drop-dialog: rgba(5, 1, 15, 0.85);
+				--font-size-sm: 1rem;
 			}
 			*,
 			*::before,

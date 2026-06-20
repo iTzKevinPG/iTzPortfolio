@@ -2,8 +2,10 @@
 	position: absolute;
 	top: 0;
 	left: 0;
-	width: 100vw;
+	width: 100%;
 	height: 100vh;
+	// Recorta el desplazamiento del parallax para que no genere scroll horizontal.
+	overflow: hidden;
 	background: var(--surface-0);
 	background: linear-gradient(139deg, var(--surface-0) 0%, var(--surface-2) 50%, var(--main-purple) 100%);
 	z-index: -1;
@@ -16,6 +18,11 @@
 		height: 100%;
 		overflow: hidden;
 
+		// Parallax: las variables las escribe el componente (mouse + scroll).
+		transform: translate3d(calc(var(--parallax-x, 0) * 1px), calc(var(--parallax-y, 0) * 1px), 0);
+		transition: transform 0.25s ease-out;
+		will-change: transform;
+
 		& li {
 			position: absolute;
 			display: flex;
@@ -26,6 +33,7 @@
 			height: 1.25rem;
 			animation: animate 25s linear infinite;
 			bottom: -9.375rem;
+			filter: drop-shadow(0 0 8px hsl(from var(--royal-purple) h s l / 45%));
 
 			& img {
 				width: 75%;
@@ -130,8 +138,16 @@
 @keyframes animate {
 	0% {
 		transform: translateY(0) rotate(0deg);
-		opacity: 1;
+		opacity: 0;
 		border-radius: 1;
+	}
+
+	10% {
+		opacity: 0.85;
+	}
+
+	80% {
+		opacity: 0.85;
 	}
 
 	100% {

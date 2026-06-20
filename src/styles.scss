@@ -7,6 +7,27 @@
 	box-sizing: border-box;
 }
 
+// Foco visible global (antes no existia ninguno en los elementos interactivos)
+:focus-visible {
+	outline: 2px solid var(--royal-purple);
+	outline-offset: 2px;
+	border-radius: 0.25rem;
+}
+
+// Reveal al hacer scroll (lo activa la directiva appReveal añadiendo `is-visible`).
+.reveal {
+	opacity: 0;
+	transform: translateY(1.5rem);
+	transition:
+		opacity var(--reveal-duration) ease,
+		transform var(--reveal-duration) ease;
+
+	&.is-visible {
+		opacity: 1;
+		transform: none;
+	}
+}
+
 body {
 	margin: 0px;
 	position: relative;

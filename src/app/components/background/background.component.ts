@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { afterNextRender, Component, DestroyRef, inject, OnInit } from '@angular/core';
 
 @Component({
 	selector: 'app-background',
@@ -29,11 +29,50 @@ export class BackgroundComponent implements OnInit {
 
 	items: string[] = [];
 
+	private readonly destroyRef = inject(DestroyRef);
+
 	private getRandomImg(): string {
 		return this.images[Math.floor(Math.random() * Object.keys(this.images).length) + 1];
 	}
 
 	ngOnInit(): void {
 		this.items = Array.from({ length: 12 }, () => this.getRandomImg() ?? 'kevin');
+	}
+
+	constructor() {
+		// Parallax sutil al mouse. Las variables se escriben en :root para que tanto el fondo
+		// como el nav lateral puedan reaccionar al mismo movimiento. afterNextRender => navegador.
+		afterNextRender(() => {
+			const rootStyle = document.documentElement.style;
+			let frame = 0;
+			let pointerX = 0;
+			let pointerY = 0;
+
+			const apply = (): void => {
+				frame = 0;
+				rootStyle.setProperty('--parallax-x', `${pointerX}`);
+				rootStyle.setProperty('--parallax-y', `${pointerY}`);
+			};
+
+			const onPointerMove = (event: PointerEvent): void => {
+				// Rango ~±18px alrededor del centro del viewport.
+				pointerX = (event.clientX / window.innerWidth - 0.5) * 36;
+				pointerY = (event.clientY / window.innerHeight - 0.5) * 36;
+				if (!frame) {
+					frame = requestAnimationFrame(apply);
+				}
+			};
+
+			window.addEventListener('pointermove', onPointerMove, { passive: true });
+
+			this.destroyRef.onDestroy(() => {
+				window.removeEventListener('pointermove', onPointerMove);
+				if (frame) {
+					cancelAnimationFrame(frame);
+				}
+				rootStyle.removeProperty('--parallax-x');
+				rootStyle.removeProperty('--parallax-y');
+			});
+		});
 	}
 }

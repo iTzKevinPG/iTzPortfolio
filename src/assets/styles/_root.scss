@@ -46,9 +46,18 @@
 	--info-color: var(--royal-purple);
 
 	// font
+	// NOTA: --font-size-sm tambien se declara en el critical-css de index.html (DUPLICADO, mantener en sync)
 	--font-family: 'Roboto', sans-serif;
+	--font-family-display: 'Space Grotesk', 'Roboto', sans-serif;
 	--font-size-lg: 2.5rem;
 	--font-size-md: 1.25rem;
 	--font-size-sm: 1rem;
 	--font-size-xs: 0.783rem;
+
+	// layout (tokeniza el sistema de anchos; los media queries de home ajustan estos valores una sola vez)
+	--section-width: 60%;
+	--section-pad-x: 5rem;
+
+	// motion (centraliza el timing de los reveals al hacer scroll)
+	--reveal-duration: 0.6s;
 }
