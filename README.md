@@ -19,6 +19,10 @@ Sitio estático en **Astro 7**, con movimiento en **GSAP + ScrollTrigger + Lenis
 
 Requiere Node ≥ 22.23 (`.node-version` fija 24 para Cloudflare).
 
+> **Ojo con el lockfile en Windows.** Un `npm install <paquete>` incremental deja fuera dependencias opcionales de
+> otras plataformas (`@emnapi/*` 2.0.0-beta.2) y `npm ci` falla en Linux (Cloudflare y GitHub Actions). Después de
+> añadir o quitar dependencias, regenera el lockfile desde cero: `rm -rf node_modules package-lock.json && npm install`.
+
 ## Estructura
 
 ```
