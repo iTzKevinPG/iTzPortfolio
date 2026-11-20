@@ -4,6 +4,9 @@ import TechList from '@/components/ui/TechList.astro';
 import Shot from '@/components/ui/Shot.astro';
 import Icon from '@/components/ui/Icon.astro';
 import { projects } from '@/data/site';
+import { liveProjects } from '@/data/live';
+
+const liveById = new Map(liveProjects.map((l) => [l.id, l]));
 import { rich } from '@/lib/text';
 ---
 
@@ -36,10 +39,27 @@ import { rich } from '@/lib/text';
 							<p class="card__text" set:html={rich(t)} />
 						))}
 						<TechList items={p.tech} label={`Tecnologías de ${p.name}`} />
-						{p.href && (
-							<a class="card__link" href={p.href} target="_blank" rel="noopener">
-								Ver el código <Icon name="external" />
-							</a>
+						{(p.liveId || p.href) && (
+							<p class="card__links">
+								{p.liveId && liveById.get(p.liveId) && (
+									<a
+										class="card__link card__link--live"
+										href={liveById.get(p.liveId)!.url}
+										target="_blank"
+										rel="noopener"
+										data-live-probe={`${p.liveId}:site`}
+									>
+										<span class="card__dot" aria-hidden="true" />
+										{new URL(liveById.get(p.liveId)!.url).hostname}
+										<Icon name="external" />
+									</a>
+								)}
+								{p.href && (
+									<a class="card__link" href={p.href} target="_blank" rel="noopener">
+										Ver el código <Icon name="external" />
+									</a>
+								)}
+							</p>
 						)}
 					</div>
 				</li>
@@ -123,6 +143,41 @@ import { rich } from '@/lib/text';
 
 	.card :global(.tech) {
 		margin-top: var(--space-2);
+	}
+
+	.card__links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-2) var(--space-6);
+	}
+
+	.card__links .card__link {
+		margin-top: 0;
+	}
+
+	.card__link--live {
+		font-family: var(--font-mono);
+		font-size: var(--text-xs);
+		color: var(--text);
+	}
+
+	.card__dot {
+		width: 0.5rem;
+		height: 0.5rem;
+		border-radius: 50%;
+		background: var(--line-strong);
+		transition:
+			background-color var(--dur) ease,
+			box-shadow var(--dur) ease;
+	}
+
+	.card__link--live[data-state='ok'] .card__dot {
+		background: var(--live);
+		box-shadow: 0 0 8px var(--live);
+	}
+
+	.card__link--live[data-state='down'] .card__dot {
+		background: #ff5d5d;
 	}
 
 	.card__link {

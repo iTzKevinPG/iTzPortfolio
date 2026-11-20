@@ -13,7 +13,7 @@ import pragma from '@/assets/img/Pragma.png';
 import pirani from '@/assets/img/PiraniRisk.png';
 import dynaudit from '@/assets/img/Dynaudit.png';
 import metro from '@/assets/img/MetroCivica.png';
-import fairsplit from '@/assets/img/FairSplit.png';
+import mitimiti from '@/assets/live/mitimiti.jpg';
 import juliana from '@/assets/img/Juliana.png';
 import glamping from '@/assets/img/Glamping.png';
 import sismos from '@/assets/img/ProjectSesismes.png';
@@ -164,27 +164,32 @@ export type Project = {
 	paragraphs: string[];
 	tech: Tech[];
 	shot: Shot;
+	/** Repositorio público (muestra "Ver el código"). */
 	href?: string;
+	/** id en src/data/live.ts si el proyecto está publicado: muestra su estado en vivo y el enlace al sitio. */
+	liveId?: string;
 };
 
 export const projects: Project[] = [
 	{
-		name: 'FairSplit',
+		name: 'MitiMiti',
 		kind: 'Personal',
 		role: 'Diseño y desarrollo',
-		accent: '#61dafb',
+		accent: '#14b8a6',
 		paragraphs: [
-			'Plataforma para dividir gastos en grupo, con **balances al instante** y transferencias sugeridas. Nació para acabar con el "¿quién me debe?" y cerrar cuentas sin fricción, en modo local o con perfil en la nube.',
-			'Cuidé la experiencia entre el detalle y la vista general para cargar el evento sin perder contexto.'
+			'App para dividir gastos entre amigos sin dramas: eventos, gastos, **balances al instante** y transferencias sugeridas, como invitado o con perfil en la nube. Nació como FairSplit y hoy está en producción con marca propia.',
+			'Front en React + Zustand y una **API NestJS** con colas BullMQ para escanear facturas y almacenamiento S3.'
 		],
 		tech: [
 			{ name: 'React', icon: 'react' },
 			{ name: 'TypeScript', icon: 'typescript' },
-			{ name: 'Vite', icon: 'vite' },
 			{ name: 'Tailwind', icon: 'tailwindcss' },
-			{ name: 'Zustand' }
+			{ name: 'Zustand' },
+			{ name: 'NestJS', icon: 'nestjs' },
+			{ name: 'BullMQ' }
 		],
-		shot: { src: fairsplit, alt: 'Interfaz de FairSplit con balances del grupo' }
+		shot: { src: mitimiti, alt: 'Pantalla de inicio de MitiMiti para crear un evento' },
+		liveId: 'mitimiti'
 	},
 	{
 		name: 'Juliana Cloud',

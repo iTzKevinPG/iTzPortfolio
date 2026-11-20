@@ -20,21 +20,15 @@ _Actualizado el 19/11/2026, tras la migración a Astro._
 - [x] Pages Function `/api/status` con lista blanca y caché de 30 s; descubrimiento de subdominios por DNS (opcional).
 - [x] Banda en el home, entrada "En vivo" en la navegación, pastilla en el hero y enlace en el pie.
 - [x] Capturas de los 6 proyectos (`npm run live:shots`).
-
+- [x] www.itzkevindev.tech añadido como dominio en Pages (el canónico sigue siendo el dominio principal).
+- [x] FairSplit renombrado a MitiMiti en Proyectos, con captura actual y enlace en vivo; etapas confirmadas por Kevin.
 ## Por hacer
 
-- [ ] **www.itzkevindev.tech da error 522.** En Pages → itzportfolio → *Custom domains* añadir
-      `www.itzkevindev.tech` y luego una regla de redirección www → apex (el canónico ya es el apex).
+- [ ] Enlaces a repositorio de Sismicidad y Glamping si son públicos (`href` en `site.ts`).
 - [ ] Descubrimiento automático de subdominios: crear un token de Cloudflare con *Zone → DNS → Read* para la zona
       y añadir `CF_API_TOKEN` y `CF_ZONE_ID` en Pages → *Settings → Variables* (producción y vista previa).
 - [ ] API de MitiMiti: exponer `GET /health` y cambiar su `check` a `'health'` en `src/data/live.ts`.
-- [ ] Confirmar la etapa real de cada proyecto (`stage` en `src/data/live.ts`): hoy solo Goldem está como producción.
-- [ ] ¿FairSplit (en Proyectos) es MitiMiti? Si sí, unificar o enlazar las dos fichas.
-
-- [ ] **Cloudflare Pages:** confirmar en el panel que *Build command* = `npm run build` y *Output* = `dist`
-      (antes apuntaba al build de Angular). Ver README → Despliegue.
 - [ ] Probar en un móvil real de gama media (scroll suave, cintas, línea de experiencia).
 - [ ] Correr Lighthouse en la URL publicada (meta: ≥ 90 en móvil).
 - [ ] Decidir si se publica un correo de contacto (hoy solo LinkedIn, GitHub y CV).
-- [ ] Enlaces a demo/repositorio de FairSplit, Sismicidad y Glamping si son públicos (`href` en `site.ts`).
 - [ ] Opcional: activar Cloudflare Web Analytics (la CSP ya permite su script).

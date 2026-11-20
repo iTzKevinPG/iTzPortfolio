@@ -107,9 +107,10 @@ export const liveProjects: LiveProject[] = [
 		name: 'MitiMiti',
 		url: 'https://mitimiti.itzkevindev.tech',
 		kind: 'Personal',
-		stage: 'construccion',
+		stage: 'produccion',
 		summary: 'App para dividir gastos entre amigos: eventos, facturas, balances y transferencias sugeridas.',
-		detail: 'React + Zustand en el front; API NestJS con colas BullMQ para escanear facturas y almacenamiento S3.',
+		detail:
+			'Proyecto de aprendizaje (antes FairSplit). React + Zustand en el front; API NestJS con colas BullMQ para escanear facturas y almacenamiento S3.',
 		stack: [
 			{ name: 'React', icon: 'react' },
 			{ name: 'Vite', icon: 'vite' },
@@ -126,10 +127,10 @@ export const liveProjects: LiveProject[] = [
 		name: 'Stream Fighters 5 · Pixel Edition',
 		url: 'https://stream-fighters.itzkevindev.tech',
 		kind: 'Proyecto fan',
-		stage: 'construccion',
+		stage: 'produccion',
 		summary: 'Juego de peleas en pixel art para el navegador, homenaje sin ánimo de lucro al evento Stream Fighters.',
 		detail:
-			'Motor propio en TypeScript: render, HUD, efectos y laboratorio de pruebas. Arte, audio y código originales.',
+			'Proyecto de aprendizaje hecho por gusto. Motor propio en TypeScript: render, HUD, efectos y laboratorio de pruebas. Arte, audio y código originales.',
 		stack: [{ name: 'TypeScript', icon: 'typescript' }, { name: 'Canvas' }, { name: 'Vitest', icon: 'vitest' }],
 		accent: '#ff4d6d'
 	}
