@@ -1,6 +1,6 @@
 # iTzPortfolio
 
-Portafolio personal de Kevin Useche — [itzkevindev.tech](https://www.itzkevindev.tech).
+Portafolio personal de Kevin Useche — [itzkevindev.tech](https://itzkevindev.tech).
 
 Sitio estático en **Astro 7**, con movimiento en **GSAP + ScrollTrigger + Lenis** y despliegue en
 **Cloudflare Pages**. Sistema de marca "Planos vivos" documentado en [`docs/BRAND.md`](docs/BRAND.md).
@@ -14,8 +14,14 @@ Sitio estático en **Astro 7**, con movimiento en **GSAP + ScrollTrigger + Lenis
 | `npm run preview` | Sirve `dist/` para revisarlo |
 | `npm run check` | Chequeo de tipos de Astro y TypeScript |
 | `npm run format` | Prettier |
+| `npm run live:shots` | Captura la portada de cada proyecto en vivo (usa Edge o Chrome local) |
+| `npx wrangler pages dev dist` | Sirve el build **con** la función `/api/status` (tras `npm run build`) |
 
 Requiere Node ≥ 22.23 (`.node-version` fija 24 para Cloudflare).
+
+> **Ojo con el lockfile en Windows.** Un `npm install <paquete>` incremental deja fuera dependencias opcionales de
+> otras plataformas (`@emnapi/*` 2.0.0-beta.2) y `npm ci` falla en Linux (Cloudflare y GitHub Actions). Después de
+> añadir o quitar dependencias, regenera el lockfile desde cero: `rm -rf node_modules package-lock.json && npm install`.
 
 ## Estructura
 
@@ -30,7 +36,11 @@ src/
   layouts/BaseLayout.astro  ← <head>, SEO, Open Graph, JSON-LD, carga de scripts
   scripts/              ← motion.ts (GSAP, carga diferida), nav.ts, motion-pref.ts
   styles/               ← tokens.css (marca) y global.css (base)
-  pages/                ← index, 404, sitemap.xml
+  pages/                ← index, en-vivo, 404, sitemap.xml
+  data/live.ts          ← registro de proyectos en vivo (subdominios, APIs, etapa)
+  components/live/      ← mapa (LiveMap) y ficha (LiveCard) de /en-vivo
+functions/api/status.ts ← Pages Function: estado y latencia de los proyectos (caché 30 s)
+scripts/live-shots.mjs  ← capturas de los proyectos en vivo (npm run live:shots)
 public/                 ← _headers (seguridad y caché), _redirects, robots.txt, favicon, og.jpg
 docs/BRAND.md           ← reglas de marca y cómo crear secciones, módulos y páginas
 ```

@@ -1,0 +1,58 @@
+---
+import MotionToggle from '@/components/chrome/MotionToggle.astro';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="foot">
+	<div class="wrap foot__row">
+		<p>© {year} Kevin Useche · Hecho con Astro</p>
+		<nav class="foot__nav" aria-label="Pie de página">
+			<a href="/">Inicio</a>
+			<a href="/en-vivo">
+				<span class="foot__dot" aria-hidden="true"></span>En vivo
+			</a>
+		</nav>
+		<MotionToggle />
+	</div>
+</footer>
+
+<style>
+	.foot {
+		border-top: 1px solid var(--border);
+		padding-block: var(--space-6);
+		color: var(--text-muted);
+		font-size: var(--text-sm);
+	}
+
+	.foot__row {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--space-4);
+	}
+
+	.foot__nav {
+		display: flex;
+		gap: var(--space-6);
+	}
+
+	.foot__nav a {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-2);
+		transition: color var(--dur-fast) ease;
+	}
+
+	.foot__nav a:hover {
+		color: var(--text);
+	}
+
+	.foot__dot {
+		width: 0.45rem;
+		height: 0.45rem;
+		border-radius: 50%;
+		background: var(--live);
+	}
+</style>

@@ -1,0 +1,323 @@
+---
+/**
+ * Constelación de proyectos: itzkevindev.tech al centro, un nodo por subdominio y un satélite por API.
+ * Cada nodo lleva `data-live-probe` (scripts/live.ts lo pinta según el estado). Los "paquetes" que viajan
+ * por las líneas solo se ven cuando ese nodo está en línea.
+ *
+ * Dos composiciones calculadas al compilar: horizontal (escritorio) y vertical (móvil), para que las
+ * etiquetas sigan legibles en pantallas pequeñas.
+ */
+import { liveDomain, liveProjects } from '@/data/live';
+
+type Props = { compact?: boolean; linked?: boolean; class?: string };
+/** `linked={false}` cuando el mapa va dentro de otro enlace (no se pueden anidar <a>). */
+const { compact = false, linked = true, class: className } = Astro.props;
+const Wrap = linked ? 'a' : 'g';
+
+type Layout = { w: number; h: number; rx: number; ry: number; apiOut: number; font: number; start: number };
+const layouts: Record<'wide' | 'tall', Layout> = {
+	wide: {
+		w: 1000,
+		h: compact ? 460 : 520,
+		rx: 340,
+		ry: compact ? 150 : 185,
+		apiOut: 1.32,
+		font: compact ? 24 : 14,
+		start: -90
+	},
+	tall: { w: 420, h: 640, rx: 135, ry: 235, apiOut: 1.3, font: 13, start: -90 }
+};
+
+function build(l: Layout) {
+	const cx = l.w / 2;
+	const cy = l.h / 2;
+	const n = liveProjects.length;
+	return liveProjects.map((p, i) => {
+		const a = ((l.start + (360 / n) * i + 360 / n / 2) * Math.PI) / 180;
+		const x = cx + Math.cos(a) * l.rx;
+		const y = cy + Math.sin(a) * l.ry;
+		const ax = cx + Math.cos(a) * l.rx * l.apiOut;
+		const ay = cy + Math.sin(a) * l.ry * l.apiOut;
+		const right = Math.cos(a) >= 0;
+		// Etiqueta del lado del núcleo en los nodos de arriba/abajo (el satélite de la API va hacia fuera).
+		const sin = Math.sin(a);
+		const below = sin < -0.2;
+		// Curva suave del centro al nodo (control desplazado en perpendicular).
+		const mx = (cx + x) / 2 - Math.sin(a) * 30;
+		const my = (cy + y) / 2 + Math.cos(a) * 30;
+		return {
+			p,
+			x,
+			y,
+			ax,
+			ay,
+			path: `M${cx.toFixed(1)} ${cy.toFixed(1)} Q${mx.toFixed(1)} ${my.toFixed(1)} ${x.toFixed(1)} ${y.toFixed(1)}`,
+			apiPath: `M${x.toFixed(1)} ${y.toFixed(1)} L${ax.toFixed(1)} ${ay.toFixed(1)}`,
+			label: new URL(p.url).hostname.replace(`.${liveDomain}`, ''),
+			lx: x + (right ? 16 : -16),
+			ly: y + (below ? l.font + 14 : -(l.font + 4)),
+			anchor: right ? 'start' : 'end',
+			dur: (2.6 + ((i * 7) % 5) * 0.35).toFixed(2)
+		};
+	});
+}
+---
+
+<div class:list={['lm', { 'lm--compact': compact }, className]} data-live-map>
+	{(['wide', 'tall'] as const).map((kind) => {
+		const l = layouts[kind];
+		const nodes = build(l);
+		const cx = l.w / 2;
+		const cy = l.h / 2;
+		return (
+			<svg
+				class={`lm__svg lm__svg--${kind}`}
+				viewBox={`0 0 ${l.w} ${l.h}`}
+				role="img"
+				aria-label={`Mapa de proyectos en vivo bajo ${liveDomain}`}
+				style={`--font:${l.font}px`}
+			>
+				<g class="lm__orbits" aria-hidden="true">
+					<ellipse cx={cx} cy={cy} rx={l.rx} ry={l.ry} />
+					<ellipse cx={cx} cy={cy} rx={l.rx * l.apiOut} ry={l.ry * l.apiOut} />
+				</g>
+
+				{nodes.map((n) => (
+					<Wrap href={linked ? `/en-vivo#p-${n.p.id}` : undefined} class="lm__link" style={`--acc:${n.p.accent}`}>
+						<title>{n.p.name}</title>
+						{n.p.api && (
+							<g class="lm__api" data-live-probe={`${n.p.id}:api`}>
+								<path class="lm__wire lm__wire--api" d={n.apiPath} pathLength="1" data-lm-wire />
+								<circle class="lm__packet" r="2.5">
+									<animateMotion
+										dur={`${(Number(n.dur) * 0.6).toFixed(2)}s`}
+										repeatCount="indefinite"
+										path={n.apiPath}
+									/>
+								</circle>
+								<rect class="lm__api-node" x={n.ax - 6} y={n.ay - 6} width="12" height="12" rx="3" />
+							</g>
+						)}
+						<g class="lm__site" data-live-probe={`${n.p.id}:site`}>
+							<path class="lm__wire" d={n.path} pathLength="1" data-lm-wire />
+							<circle class="lm__packet" r="3">
+								<animateMotion dur={`${n.dur}s`} repeatCount="indefinite" path={n.path} />
+							</circle>
+							<circle class="lm__halo" cx={n.x} cy={n.y} r="16" />
+							<circle class="lm__node" cx={n.x} cy={n.y} r="8" />
+							<text class="lm__label" x={n.lx} y={n.ly} text-anchor={n.anchor}>
+								{n.label}
+							</text>
+						</g>
+					</Wrap>
+				))}
+
+				<g class="lm__core" aria-hidden="true">
+					<circle class="lm__core-ring" cx={cx} cy={cy} r="46" />
+					<circle class="lm__core-ring lm__core-ring--2" cx={cx} cy={cy} r="46" />
+					<circle class="lm__core-node" cx={cx} cy={cy} r="30" />
+					<text class="lm__core-label" x={cx} y={cy + 4} text-anchor="middle">
+						KU
+					</text>
+					{!compact && (
+						<text class="lm__label lm__label--core" x={cx} y={cy + 72} text-anchor="middle">
+							{liveDomain}
+						</text>
+					)}
+				</g>
+			</svg>
+		);
+	})}
+</div>
+
+<style>
+	.lm {
+		position: relative;
+	}
+
+	.lm__svg {
+		width: 100%;
+		height: auto;
+		overflow: visible;
+	}
+
+	.lm__svg--tall {
+		display: none;
+		max-width: 26rem;
+		margin-inline: auto;
+	}
+
+	@media (width < 700px) {
+		.lm__svg--wide {
+			display: none;
+		}
+
+		.lm__svg--tall {
+			display: block;
+		}
+	}
+
+	.lm__orbits ellipse {
+		fill: none;
+		stroke: var(--line);
+		stroke-dasharray: 3 7;
+	}
+
+	/* ---- Cables y paquetes ---- */
+	.lm__wire {
+		fill: none;
+		stroke: var(--line-strong);
+		stroke-width: 1.5;
+		transition: stroke 0.5s ease;
+	}
+
+	.lm__wire--api {
+		stroke-dasharray: 2 4;
+	}
+
+	[data-state='ok'] > .lm__wire {
+		stroke: color-mix(in srgb, var(--violet) 70%, transparent);
+	}
+
+	[data-state='down'] > .lm__wire {
+		stroke: color-mix(in srgb, #ff5d5d 55%, transparent);
+	}
+
+	.lm__packet {
+		fill: var(--live);
+		opacity: 0;
+		transition: opacity 0.4s ease;
+	}
+
+	[data-state='ok'] > .lm__packet {
+		opacity: 1;
+	}
+
+	:global(.mov-reducido) .lm__packet {
+		display: none;
+	}
+
+	/* ---- Nodos ---- */
+	.lm__node,
+	.lm__api-node {
+		fill: var(--ink);
+		stroke: var(--line-strong);
+		stroke-width: 2;
+		transition:
+			fill 0.4s ease,
+			stroke 0.4s ease;
+	}
+
+	.lm__halo {
+		fill: var(--live);
+		opacity: 0;
+		transform-box: fill-box;
+		transform-origin: center;
+	}
+
+	[data-state='checking'] .lm__node,
+	[data-state='checking'] .lm__api-node {
+		animation: lm-blink 1.2s ease-in-out infinite;
+	}
+
+	@keyframes lm-blink {
+		50% {
+			stroke: var(--violet);
+		}
+	}
+
+	[data-state='ok'] .lm__node,
+	[data-state='ok'] .lm__api-node {
+		fill: color-mix(in srgb, var(--live) 30%, var(--ink));
+		stroke: var(--live);
+	}
+
+	[data-state='ok'] .lm__halo {
+		animation: lm-halo 2.6s var(--ease-out) infinite;
+	}
+
+	@keyframes lm-halo {
+		0% {
+			opacity: 0.45;
+			transform: scale(0.5);
+		}
+		100% {
+			opacity: 0;
+			transform: scale(1.6);
+		}
+	}
+
+	[data-state='down'] .lm__node,
+	[data-state='down'] .lm__api-node {
+		fill: color-mix(in srgb, #ff5d5d 25%, var(--ink));
+		stroke: #ff5d5d;
+	}
+
+	/* ---- Etiquetas ---- */
+	.lm__label {
+		font-family: var(--font-mono);
+		font-size: var(--font);
+		fill: var(--text-muted);
+		transition: fill 0.3s ease;
+	}
+
+	[data-state='ok'] .lm__label {
+		fill: var(--text);
+	}
+
+	.lm__link:hover .lm__label,
+	.lm__link:focus-visible .lm__label {
+		fill: var(--live);
+	}
+
+	.lm__link:hover .lm__node {
+		stroke-width: 3;
+	}
+
+	.lm__link:focus-visible {
+		outline: none;
+	}
+
+	/* ---- Núcleo ---- */
+	.lm__core-node {
+		fill: var(--violet-deep);
+		stroke: var(--violet);
+		stroke-width: 2;
+	}
+
+	.lm__core-label {
+		font-family: var(--font-display);
+		font-weight: 700;
+		font-size: 20px;
+		fill: var(--paper);
+		letter-spacing: -0.02em;
+	}
+
+	.lm__label--core {
+		fill: var(--accent-text);
+	}
+
+	.lm__core-ring {
+		fill: none;
+		stroke: var(--violet);
+		opacity: 0;
+		transform-box: fill-box;
+		transform-origin: center;
+		animation: lm-core 3.2s var(--ease-out) infinite;
+	}
+
+	.lm__core-ring--2 {
+		animation-delay: 1.6s;
+	}
+
+	@keyframes lm-core {
+		0% {
+			opacity: 0.6;
+			transform: scale(0.7);
+		}
+		100% {
+			opacity: 0;
+			transform: scale(1.9);
+		}
+	}
+</style>

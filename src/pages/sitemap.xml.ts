@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
 
 // Una sola página indexable por ahora. Al sumar páginas, añadirlas aquí (ver docs/BRAND.md).
-const pages = ['/'];
+const pages = ['/', '/en-vivo'];
 
 export const GET: APIRoute = ({ site }) => {
 	const today = new Date().toISOString().slice(0, 10);

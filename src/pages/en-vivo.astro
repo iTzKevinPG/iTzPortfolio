@@ -1,0 +1,506 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import LiveMap from '@/components/live/LiveMap.astro';
+import LiveCard from '@/components/live/LiveCard.astro';
+import Footer from '@/components/chrome/Footer.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { liveDomain, liveProjects } from '@/data/live';
+
+const total = liveProjects.length;
+const apis = liveProjects.filter((p) => p.api).length;
+const steps = [
+	{
+		title: 'Un registro',
+		text: 'Cada proyecto es una entrada en un archivo de datos: URL, API, etapa y stack. Añadir uno es un commit.'
+	},
+	{
+		title: 'Una función en el borde',
+		text: 'Una Cloudflare Pages Function comprueba en paralelo los sitios y sus APIs, mide latencia y cachea 30 s.'
+	},
+	{
+		title: 'Descubrimiento',
+		text: 'Con un token de solo lectura, la misma función revisa el DNS de la zona: un subdominio nuevo aparece aquí sin tocar código.'
+	}
+];
+---
+
+<BaseLayout
+	title="En vivo · Kevin Useche"
+	description={`Los proyectos que construí y mantengo bajo ${liveDomain}, con su estado y latencia en tiempo real.`}
+>
+	<header class="topbar">
+		<div class="wrap topbar__row">
+			<a class="topbar__back" href="/">
+				<Icon name="arrow" class="topbar__arrow" /> Kevin Useche
+			</a>
+			<p class="topbar__status">
+				<span class="topbar__dot" aria-hidden="true"></span>
+				Comprobado <span data-live-checked>ahora</span>
+			</p>
+		</div>
+	</header>
+
+	<main id="contenido">
+		<section class="hero-live wrap" aria-labelledby="live-title">
+			<h1 id="live-title" class="hero-live__title" data-head>
+				<span>Lo que está corriendo ahora.</span>
+			</h1>
+			<p class="hero-live__lead" data-reveal>
+				Sitios y APIs que diseñé, construí y mantengo bajo <strong>{liveDomain}</strong>, para clientes y por gusto. El
+				estado no es una foto: se comprueba en tiempo real cada vez que entras.
+			</p>
+
+			<dl class="stats" data-reveal>
+				<div>
+					<dt>Sitios en línea</dt>
+					<dd>
+						<span data-live-count="sites">—</span>
+						<small>/{total}</small>
+					</dd>
+				</div>
+				<div>
+					<dt>APIs respondiendo</dt>
+					<dd>
+						<span data-live-count="apis">—/{apis}</span>
+					</dd>
+				</div>
+				<div>
+					<dt>Latencia media</dt>
+					<dd>
+						<span data-live-avg>—</span>
+					</dd>
+				</div>
+				<div class="stats__action">
+					<button type="button" class="btn" data-live-refresh>
+						<span class="stats__spin" aria-hidden="true"></span> Comprobar ahora
+					</button>
+				</div>
+			</dl>
+		</section>
+
+		<section class="map-wrap wrap" aria-label="Mapa de proyectos">
+			<LiveMap />
+			<p class="map-legend" aria-hidden="true">
+				<span>
+					<i class="lg lg--site"></i> sitio
+				</span>
+				<span>
+					<i class="lg lg--api"></i> API
+				</span>
+				<span>
+					<i class="lg lg--ok"></i> en línea
+				</span>
+				<span>
+					<i class="lg lg--down"></i> sin respuesta
+				</span>
+			</p>
+		</section>
+
+		<section class="board wrap" aria-labelledby="board-title">
+			<h2 id="board-title" class="board__title" data-head>
+				<span>Proyectos</span>
+			</h2>
+			<div class="board__grid">
+				{liveProjects.map((p) => (
+					<LiveCard project={p} />
+				))}
+			</div>
+
+			<div class="found" data-live-discovered-wrap hidden>
+				<h3 class="found__title">Nodos nuevos detectados</h3>
+				<p class="found__lead">Subdominios que ya existen en DNS y todavía no tienen ficha.</p>
+				<ul class="found__list" data-live-discovered></ul>
+				<template data-live-discovered-tpl>
+					<li class="found__item">
+						<a data-d-link target="_blank" rel="noopener">
+							<span class="found__dot" aria-hidden="true"></span>
+							<span data-d-host></span>
+							<span class="found__meta">
+								<span data-live-code></span> <span data-live-ms></span>
+							</span>
+						</a>
+					</li>
+				</template>
+			</div>
+		</section>
+
+		<section class="how wrap" aria-labelledby="how-title">
+			<h2 id="how-title" class="board__title" data-head>
+				<span>Cómo funciona</span>
+			</h2>
+			<ol class="how__list">
+				{steps.map((s, i) => (
+					<li class="how__step" data-reveal>
+						<span class="how__n">{String(i + 1).padStart(2, '0')}</span>
+						<h3>{s.title}</h3>
+						<p>{s.text}</p>
+					</li>
+				))}
+			</ol>
+		</section>
+	</main>
+
+	<Footer />
+</BaseLayout>
+
+<script>
+	import { initLive } from '@/scripts/live';
+	initLive();
+</script>
+
+<style>
+	/* ---- Barra superior ---- */
+	.topbar {
+		position: sticky;
+		top: 0;
+		z-index: var(--z-nav);
+		background: color-mix(in srgb, var(--bg) 80%, transparent);
+		backdrop-filter: blur(10px);
+		border-bottom: 1px solid var(--border);
+	}
+
+	.topbar__row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--space-4);
+		min-height: 3.5rem;
+	}
+
+	.topbar__back {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-2);
+		font-family: var(--font-display);
+		font-weight: 600;
+	}
+
+	.topbar__back :global(.topbar__arrow) {
+		width: 1rem;
+		height: 1rem;
+		rotate: 180deg;
+		transition: translate var(--dur) var(--ease-out);
+	}
+
+	.topbar__back:hover :global(.topbar__arrow) {
+		translate: -3px 0;
+	}
+
+	.topbar__status {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-2);
+		font-family: var(--font-mono);
+		font-size: var(--text-xs);
+		color: var(--text-muted);
+	}
+
+	.topbar__dot {
+		width: 0.5rem;
+		height: 0.5rem;
+		border-radius: 50%;
+		background: var(--line-strong);
+	}
+
+	:global(html[data-live-ready]) .topbar__dot {
+		background: var(--live);
+		box-shadow: 0 0 10px var(--live);
+		animation: live-pulse 2.4s var(--ease-out) infinite;
+	}
+
+	:global(html[data-live-incident]) .topbar__dot {
+		background: #ff5d5d;
+		box-shadow: 0 0 10px #ff5d5d;
+	}
+
+	@keyframes live-pulse {
+		70% {
+			box-shadow: 0 0 0 0.5rem transparent;
+		}
+	}
+
+	/* ---- Portada ---- */
+	.hero-live {
+		padding-top: clamp(3rem, 2rem + 5vw, 6rem);
+	}
+
+	.hero-live__title {
+		font-size: var(--text-hero);
+		font-weight: 700;
+		letter-spacing: -0.045em;
+		line-height: 0.95;
+		max-width: 11ch;
+		overflow: clip;
+		padding-bottom: 0.08em;
+	}
+
+	.hero-live__title span {
+		display: inline-block;
+	}
+
+	.hero-live__lead {
+		margin-top: var(--space-6);
+		max-width: 40rem;
+		font-size: var(--text-lg);
+		color: var(--text-muted);
+	}
+
+	.hero-live__lead strong {
+		color: var(--text);
+		font-family: var(--font-mono);
+		font-weight: 500;
+		font-size: 0.9em;
+	}
+
+	.stats {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+		align-items: end;
+		gap: var(--space-6);
+		margin-top: var(--space-12);
+		padding-top: var(--space-6);
+		border-top: 1px solid var(--border);
+	}
+
+	.stats dt {
+		font-family: var(--font-mono);
+		font-size: var(--text-xs);
+		text-transform: uppercase;
+		letter-spacing: 0.12em;
+		color: var(--text-muted);
+	}
+
+	.stats dd {
+		margin: var(--space-2) 0 0;
+		font-family: var(--font-display);
+		font-size: var(--text-2xl);
+		font-weight: 600;
+		line-height: 1;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.stats small {
+		font-size: 0.45em;
+		color: var(--text-muted);
+		margin-left: 0.15em;
+	}
+
+	.stats__spin {
+		width: 0.85rem;
+		height: 0.85rem;
+		border-radius: 50%;
+		border: 2px solid var(--line-strong);
+		border-top-color: var(--live);
+	}
+
+	:global(html[data-live-loading]) .stats__spin {
+		animation: spin 0.8s linear infinite;
+	}
+
+	@keyframes spin {
+		to {
+			rotate: 360deg;
+		}
+	}
+
+	/* ---- Mapa ---- */
+	.map-wrap {
+		margin-top: var(--space-16);
+	}
+
+	.map-legend {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: var(--space-2) var(--space-6);
+		margin-top: var(--space-8);
+		font-family: var(--font-mono);
+		font-size: var(--text-xs);
+		color: var(--text-muted);
+	}
+
+	.map-legend span {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-2);
+	}
+
+	.lg {
+		width: 0.7rem;
+		height: 0.7rem;
+		border: 2px solid var(--line-strong);
+		background: var(--ink);
+	}
+
+	.lg--site {
+		border-radius: 50%;
+	}
+
+	.lg--api {
+		border-radius: 2px;
+	}
+
+	.lg--ok {
+		border-radius: 50%;
+		border-color: var(--live);
+		background: color-mix(in srgb, var(--live) 30%, var(--ink));
+	}
+
+	.lg--down {
+		border-radius: 50%;
+		border-color: #ff5d5d;
+	}
+
+	/* ---- Tablero ---- */
+	.board,
+	.how {
+		padding-top: var(--section-gap);
+	}
+
+	.board__title {
+		font-size: var(--text-2xl);
+		margin-bottom: var(--space-12);
+		overflow: clip;
+		padding-bottom: 0.08em;
+	}
+
+	.board__title span {
+		display: inline-block;
+	}
+
+	.board__grid {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: var(--space-6);
+	}
+
+	.found {
+		margin-top: var(--space-16);
+		padding: var(--space-8);
+		border: 1px dashed color-mix(in srgb, var(--live) 50%, transparent);
+		border-radius: var(--radius);
+	}
+
+	.found__title {
+		font-size: var(--text-xl);
+	}
+
+	.found__lead {
+		color: var(--text-muted);
+		margin-top: var(--space-2);
+	}
+
+	.found__list {
+		list-style: none;
+		padding: 0;
+		margin-top: var(--space-6);
+		display: grid;
+		gap: var(--space-2);
+		font-family: var(--font-mono);
+		font-size: var(--text-sm);
+	}
+
+	.found__item a {
+		display: flex;
+		align-items: center;
+		gap: var(--space-3);
+	}
+
+	.found__item a:hover {
+		color: var(--live);
+	}
+
+	.found__dot {
+		width: 0.55rem;
+		height: 0.55rem;
+		border-radius: 50%;
+		background: var(--line-strong);
+	}
+
+	.found__item[data-state='ok'] .found__dot {
+		background: var(--live);
+	}
+
+	.found__item[data-state='down'] .found__dot {
+		background: #ff5d5d;
+	}
+
+	.found__meta {
+		margin-left: auto;
+		color: var(--text-muted);
+	}
+
+	/* ---- Cómo funciona ---- */
+	.how {
+		padding-bottom: var(--section-gap);
+	}
+
+	.how__list {
+		list-style: none;
+		padding: 0;
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		border-top: 1px solid var(--border);
+	}
+
+	.how__step {
+		padding: var(--space-8) var(--space-6) 0 0;
+	}
+
+	.how__step + .how__step {
+		padding-left: var(--space-6);
+		border-left: 1px solid var(--border);
+	}
+
+	.how__n {
+		font-family: var(--font-mono);
+		font-size: var(--text-sm);
+		color: var(--live);
+	}
+
+	.how__step h3 {
+		font-size: var(--text-lg);
+		margin: var(--space-3) 0 var(--space-2);
+	}
+
+	.how__step p {
+		color: var(--text-muted);
+		font-size: var(--text-sm);
+	}
+
+	@media (width < 900px) {
+		.stats {
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+		}
+
+		.stats__action {
+			grid-column: 1 / -1;
+		}
+
+		.board__grid,
+		.how__list {
+			grid-template-columns: 1fr;
+		}
+
+		.how__step,
+		.how__step + .how__step {
+			padding: var(--space-6) 0;
+			border-left: 0;
+			border-bottom: 1px solid var(--border);
+		}
+	}
+
+	@media (width < 520px) {
+		.stats {
+			grid-template-columns: 1fr 1fr;
+		}
+
+		.stats dd {
+			font-size: var(--text-xl);
+		}
+
+		.topbar__status {
+			display: none;
+		}
+	}
+</style>

@@ -10,6 +10,7 @@
  * - Capturas: se destapan de arriba abajo y tienen un parallax leve.
  * - Proyectos: reflejo que sigue al cursor en cada tarjeta.
  * - Skills: las cintas corren más rápido y cambian de sentido según el scroll.
+ * - En vivo: los cables del mapa se dibujan desde el núcleo hacia cada proyecto al entrar en pantalla.
  *
  * Reglas: solo transform / opacity / clip-path; los estados ocultos los pone este script (sin JS todo
  * se ve); el botón "Reducir animaciones" (MotionToggle) apaga todo en vivo. No se lee el ajuste del SO.
@@ -55,6 +56,7 @@ function start(): void {
 		litWords();
 		timeline();
 		shots();
+		liveMap();
 		reveals();
 	});
 
@@ -102,6 +104,11 @@ function smoothScroll(): Lenis {
 /* ---------------------------------------------------------------- portada */
 
 function heroIntro(): void {
+	// Solo el home tiene esta portada; en otras páginas basta con quitar `intro`.
+	if (!document.querySelector('[data-hero]')) {
+		root.classList.remove('intro');
+		return;
+	}
 	const tl = gsap.timeline({ defaults: { ease: 'expo.out' } });
 	tl.fromTo(
 		'[data-hero-char]',
@@ -301,4 +308,27 @@ function belts(): () => void {
 		st.kill();
 		gsap.set(tracks, { clearProps: 'transform' });
 	};
+}
+
+/* ---------------------------------------------------------------- en vivo */
+
+function liveMap(): void {
+	gsap.utils.toArray<HTMLElement>('[data-live-map]').forEach((map) => {
+		const wires = map.querySelectorAll('[data-lm-wire]');
+		const nodes = map.querySelectorAll('.lm__node, .lm__api-node, .lm__label');
+		if (!wires.length) return;
+		const tl = gsap.timeline({ scrollTrigger: { trigger: map, start: 'top 80%', once: true } });
+		// pathLength="1" en cada cable: el trazo va de 1 (oculto) a 0 (completo).
+		tl.fromTo(
+			wires,
+			{ strokeDasharray: 1, strokeDashoffset: 1 },
+			{
+				strokeDashoffset: 0,
+				duration: 1.1,
+				ease: 'power3.inOut',
+				stagger: 0.06,
+				clearProps: 'strokeDasharray,strokeDashoffset'
+			}
+		).fromTo(nodes, { opacity: 0 }, { opacity: 1, duration: 0.5, stagger: 0.03 }, 0.5);
+	});
 }

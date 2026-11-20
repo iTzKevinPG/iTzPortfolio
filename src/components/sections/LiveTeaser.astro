@@ -1,0 +1,225 @@
+---
+/**
+ * Banda del home que lleva a /en-vivo: contadores reales, mapa compacto y lista de subdominios con su
+ * estado. Es el único bloque del home con fondo propio: tiene que interrumpir el scroll.
+ */
+import LiveMap from '@/components/live/LiveMap.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { liveDomain, liveProjects } from '@/data/live';
+
+const total = liveProjects.length;
+---
+
+<section id="en-vivo" class="section teaser" aria-labelledby="teaser-title">
+	<div class="wrap">
+		<a class="teaser__card" href="/en-vivo" data-card>
+			<div class="teaser__copy">
+				<p class="teaser__badge" data-reveal>
+					<span class="teaser__pulse" aria-hidden="true"></span>
+					<span>
+						<span data-live-count="sites">…</span> de {total} en línea
+					</span>
+				</p>
+				<h2 id="teaser-title" class="teaser__title" data-head>
+					<span>Proyectos en vivo</span>
+				</h2>
+				<p class="teaser__lead" data-reveal>
+					Lo que construyo no se queda en capturas: sitios y APIs que mantengo hoy bajo <code>{liveDomain}</code>, con
+					su estado comprobado en tiempo real.
+				</p>
+				<ul class="teaser__hosts" data-reveal>
+					{liveProjects.map((p) => (
+						<li data-live-probe={`${p.id}:site`}>
+							<span class="teaser__dot" aria-hidden="true" />
+							{new URL(p.url).hostname.replace(`.${liveDomain}`, '')}
+						</li>
+					))}
+				</ul>
+				<span class="btn btn--primary teaser__cta" data-reveal>
+					Entrar al panel en vivo <Icon name="arrow" class="arrow" />
+				</span>
+			</div>
+			<div class="teaser__map" aria-hidden="true">
+				<LiveMap compact linked={false} />
+			</div>
+		</a>
+	</div>
+</section>
+
+<script>
+	import { initLive } from '@/scripts/live';
+	initLive();
+</script>
+
+<style>
+	.teaser__card {
+		position: relative;
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+		align-items: center;
+		gap: var(--space-8);
+		padding: clamp(1.5rem, 1rem + 3vw, 3.5rem);
+		border: 1px solid color-mix(in srgb, var(--live) 28%, var(--border));
+		border-radius: calc(var(--radius) * 2);
+		background:
+			radial-gradient(80% 120% at 100% 50%, color-mix(in srgb, var(--violet-deep) 45%, transparent), transparent 70%),
+			linear-gradient(to right, color-mix(in srgb, var(--line) 40%, transparent) 1px, transparent 1px) 0 0 / 32px 32px,
+			linear-gradient(to bottom, color-mix(in srgb, var(--line) 40%, transparent) 1px, transparent 1px) 0 0 / 32px 32px,
+			var(--surface);
+		overflow: clip;
+		isolation: isolate;
+		transition:
+			border-color var(--dur) ease,
+			transform var(--dur) var(--ease-out);
+	}
+
+	.teaser__card::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		background: radial-gradient(
+			30rem circle at var(--px, 30%) var(--py, 30%),
+			color-mix(in srgb, var(--live) 9%, transparent),
+			transparent 60%
+		);
+		opacity: 0;
+		transition: opacity var(--dur) ease;
+	}
+
+	.teaser__card:hover {
+		border-color: color-mix(in srgb, var(--live) 60%, var(--border));
+	}
+
+	.teaser__card:hover::before {
+		opacity: 1;
+	}
+
+	.teaser__copy {
+		display: grid;
+		gap: var(--space-6);
+		justify-items: start;
+	}
+
+	.teaser__badge {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-3);
+		padding: 0.35rem 0.9rem;
+		border-radius: var(--radius-full);
+		border: 1px solid color-mix(in srgb, var(--live) 40%, transparent);
+		background: color-mix(in srgb, var(--live) 8%, transparent);
+		font-family: var(--font-mono);
+		font-size: var(--text-xs);
+		color: var(--live);
+	}
+
+	.teaser__pulse {
+		width: 0.5rem;
+		height: 0.5rem;
+		border-radius: 50%;
+		background: var(--live);
+		animation: teaser-pulse 2.2s var(--ease-out) infinite;
+	}
+
+	@keyframes teaser-pulse {
+		0% {
+			box-shadow: 0 0 0 0 color-mix(in srgb, var(--live) 70%, transparent);
+		}
+		70%,
+		100% {
+			box-shadow: 0 0 0 0.6rem transparent;
+		}
+	}
+
+	.teaser__title {
+		font-size: var(--text-2xl);
+		overflow: clip;
+		padding-bottom: 0.08em;
+	}
+
+	.teaser__title span {
+		display: inline-block;
+	}
+
+	.teaser__lead {
+		color: var(--text-muted);
+		font-size: var(--text-lg);
+		max-width: 30rem;
+	}
+
+	.teaser__lead code {
+		font-family: var(--font-mono);
+		font-size: 0.85em;
+		color: var(--text);
+	}
+
+	.teaser__hosts {
+		list-style: none;
+		padding: 0;
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-2) var(--space-4);
+		font-family: var(--font-mono);
+		font-size: var(--text-xs);
+		color: var(--text-muted);
+	}
+
+	.teaser__hosts li {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-2);
+	}
+
+	.teaser__dot {
+		width: 0.45rem;
+		height: 0.45rem;
+		border-radius: 50%;
+		background: var(--line-strong);
+		transition: background-color var(--dur) ease;
+	}
+
+	.teaser__hosts [data-state='ok'] {
+		color: var(--text);
+	}
+
+	.teaser__hosts [data-state='ok'] .teaser__dot {
+		background: var(--live);
+	}
+
+	.teaser__hosts [data-state='down'] .teaser__dot {
+		background: #ff5d5d;
+	}
+
+	.teaser__cta :global(.arrow) {
+		width: 1rem;
+		height: 1rem;
+	}
+
+	.teaser__card:hover .teaser__cta :global(.arrow) {
+		transform: translateX(3px);
+	}
+
+	/* El mapa del teaser es decorativo: sus nodos no son enlaces aquí (todo el bloque ya lo es). */
+	.teaser__map {
+		pointer-events: none;
+	}
+
+	@media (width < 960px) {
+		.teaser__card {
+			grid-template-columns: 1fr;
+		}
+
+		.teaser__map {
+			order: -1;
+			margin-inline: auto;
+			width: min(100%, 34rem);
+		}
+	}
+
+	@media (width < 700px) {
+		.teaser__map {
+			display: none;
+		}
+	}
+</style>

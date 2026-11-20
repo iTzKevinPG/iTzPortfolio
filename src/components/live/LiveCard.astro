@@ -1,0 +1,269 @@
+---
+/** Ficha de un proyecto en vivo: captura, estado del sitio y de su API, etapa, stack y enlace. */
+import type { ImageMetadata } from 'astro';
+import Shot from '@/components/ui/Shot.astro';
+import TechList from '@/components/ui/TechList.astro';
+import Icon from '@/components/ui/Icon.astro';
+import type { LiveProject } from '@/data/live';
+
+type Props = { project: LiveProject };
+const { project: p } = Astro.props;
+
+const shots = import.meta.glob<{ default: ImageMetadata }>('/src/assets/live/*.jpg', { eager: true });
+const shot = shots[`/src/assets/live/${p.id}.jpg`]?.default;
+const host = new URL(p.url).hostname;
+const apiHost = p.api ? new URL(p.api.url) : null;
+const stageLabel = p.stage === 'produccion' ? 'En producción' : 'En construcción';
+---
+
+<article id={`p-${p.id}`} class="lc" style={`--acc:${p.accent}`} data-card data-reveal>
+	{shot ? (
+		<Shot
+			shot={{ src: shot, alt: `Portada de ${p.name}` }}
+			sizes="(min-width: 1100px) 520px, (min-width: 760px) 46vw, 92vw"
+		/>
+	) : (
+		<div class="lc__noshot" aria-hidden="true">
+			{host}
+		</div>
+	)}
+
+	<div class="lc__body">
+		<header class="lc__head">
+			<h3 class="lc__name">{p.name}</h3>
+			<p class="lc__tags">
+				<span class:list={['lc__stage', `lc__stage--${p.stage}`]}>{stageLabel}</span>
+				<span class="lc__kind">{p.kind}</span>
+			</p>
+		</header>
+
+		<ul class="lc__probes">
+			<li class="probe" data-live-probe={`${p.id}:site`}>
+				<span class="probe__dot" aria-hidden="true"></span>
+				<span class="probe__name">{host}</span>
+				<span class="probe__meta">
+					<span data-live-code>—</span> <span data-live-ms></span>
+				</span>
+			</li>
+			{apiHost ? (
+				<li class="probe" data-live-probe={`${p.id}:api`}>
+					<span class="probe__dot probe__dot--api" aria-hidden="true" />
+					<span class="probe__name">API{apiHost.pathname !== '/' ? ` ${apiHost.pathname}` : ''}</span>
+					<span class="probe__meta">
+						<span data-live-code>—</span> <span data-live-ms />
+					</span>
+				</li>
+			) : (
+				<li class="probe probe--none">
+					<span class="probe__dot probe__dot--none" aria-hidden="true" />
+					<span class="probe__name">Sin API: sitio estático</span>
+				</li>
+			)}
+		</ul>
+
+		<p class="lc__summary">{p.summary}</p>
+		<p class="lc__detail">{p.detail}</p>
+		<TechList items={p.stack} label={`Stack de ${p.name}`} />
+
+		<a class="btn btn--primary lc__cta" href={p.url} target="_blank" rel="noopener">
+			Visitar {host.split('.')[0]}
+			<Icon name="external" />
+		</a>
+	</div>
+</article>
+
+<style>
+	.lc {
+		position: relative;
+		display: grid;
+		align-content: start;
+		gap: var(--space-6);
+		padding: var(--space-4);
+		border: 1px solid var(--border);
+		border-radius: calc(var(--radius) + var(--space-4) / 2);
+		background: var(--surface);
+		overflow: clip;
+		isolation: isolate;
+		scroll-margin-top: var(--space-8);
+		transition: border-color var(--dur) ease;
+	}
+
+	.lc::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		background: radial-gradient(
+			28rem circle at var(--px, 50%) var(--py, -20%),
+			color-mix(in srgb, var(--acc) 14%, transparent),
+			transparent 60%
+		);
+		opacity: 0;
+		transition: opacity var(--dur) ease;
+	}
+
+	.lc:hover {
+		border-color: color-mix(in srgb, var(--acc) 45%, var(--border));
+	}
+
+	.lc:hover::before {
+		opacity: 1;
+	}
+
+	.lc:target {
+		border-color: var(--live);
+	}
+
+	.lc__noshot {
+		display: grid;
+		place-items: center;
+		aspect-ratio: 16 / 10;
+		border-radius: var(--radius);
+		border: 1px dashed var(--line-strong);
+		font-family: var(--font-mono);
+		color: var(--text-muted);
+	}
+
+	.lc__body {
+		display: grid;
+		gap: var(--space-4);
+		padding: 0 var(--space-2) var(--space-2);
+	}
+
+	.lc__head {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: var(--space-2) var(--space-4);
+	}
+
+	.lc__name {
+		font-size: var(--text-xl);
+	}
+
+	.lc__tags {
+		display: flex;
+		gap: var(--space-2);
+		font-family: var(--font-mono);
+		font-size: var(--text-xs);
+	}
+
+	.lc__stage,
+	.lc__kind {
+		padding: 0.2em 0.65em;
+		border-radius: var(--radius-full);
+		border: 1px solid var(--border);
+		color: var(--text-muted);
+		white-space: nowrap;
+	}
+
+	.lc__stage--produccion {
+		color: var(--ink);
+		background: var(--live);
+		border-color: var(--live);
+		font-weight: 600;
+	}
+
+	.lc__stage--construccion {
+		color: var(--accent-text);
+		border-color: color-mix(in srgb, var(--violet) 45%, transparent);
+	}
+
+	/* ---- Sondas ---- */
+	.lc__probes {
+		list-style: none;
+		padding: var(--space-3) var(--space-4);
+		display: grid;
+		gap: var(--space-2);
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+		background: color-mix(in srgb, var(--ink) 60%, transparent);
+		font-family: var(--font-mono);
+		font-size: var(--text-xs);
+	}
+
+	.probe {
+		display: grid;
+		grid-template-columns: auto minmax(0, 1fr) auto;
+		align-items: center;
+		gap: var(--space-3);
+	}
+
+	.probe__name {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		color: var(--text);
+	}
+
+	.probe--none .probe__name {
+		color: var(--text-muted);
+	}
+
+	.probe__meta {
+		color: var(--text-muted);
+		white-space: nowrap;
+	}
+
+	.probe__dot {
+		width: 0.55rem;
+		height: 0.55rem;
+		border-radius: 50%;
+		background: var(--line-strong);
+		transition:
+			background-color var(--dur) ease,
+			box-shadow var(--dur) ease;
+	}
+
+	.probe__dot--api {
+		border-radius: 2px;
+	}
+
+	.probe__dot--none {
+		background: none;
+		border: 1.5px dashed var(--line-strong);
+	}
+
+	.probe[data-state='checking'] .probe__dot {
+		animation: probe-blink 1s ease-in-out infinite;
+	}
+
+	@keyframes probe-blink {
+		50% {
+			background: var(--violet);
+		}
+	}
+
+	.probe[data-state='ok'] .probe__dot {
+		background: var(--live);
+		box-shadow: 0 0 10px var(--live);
+	}
+
+	.probe[data-state='ok'] [data-live-code] {
+		color: var(--live);
+	}
+
+	.probe[data-state='down'] .probe__dot {
+		background: #ff5d5d;
+		box-shadow: 0 0 10px #ff5d5d;
+	}
+
+	.probe[data-state='down'] [data-live-code] {
+		color: #ff8a8a;
+	}
+
+	.lc__summary {
+		font-size: var(--text-base);
+	}
+
+	.lc__detail {
+		color: var(--text-muted);
+		font-size: var(--text-sm);
+	}
+
+	.lc__cta {
+		justify-self: start;
+		margin-top: var(--space-2);
+	}
+</style>

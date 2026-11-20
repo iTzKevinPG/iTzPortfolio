@@ -1,9 +1,7 @@
 ---
 import Icon from '@/components/ui/Icon.astro';
-import MotionToggle from '@/components/chrome/MotionToggle.astro';
+import Footer from '@/components/chrome/Footer.astro';
 import { contact } from '@/data/site';
-
-const year = new Date().getFullYear();
 ---
 
 <section id="contacto" class="section contact" aria-labelledby="contact-title">
@@ -28,12 +26,7 @@ const year = new Date().getFullYear();
 	</div>
 </section>
 
-<footer class="foot">
-	<div class="wrap foot__row">
-		<p>© {year} Kevin Useche · Hecho con Astro</p>
-		<MotionToggle />
-	</div>
-</footer>
+<Footer />
 
 <style>
 	.contact {
@@ -120,21 +113,6 @@ const year = new Date().getFullYear();
 
 	.contact__list li + li .contact__link:hover {
 		padding-left: calc(var(--space-6) + var(--space-4));
-	}
-
-	.foot {
-		border-top: 1px solid var(--border);
-		padding-block: var(--space-6);
-		color: var(--text-muted);
-		font-size: var(--text-sm);
-	}
-
-	.foot__row {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		justify-content: space-between;
-		gap: var(--space-4);
 	}
 
 	@media (width < 760px) {

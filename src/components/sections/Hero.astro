@@ -2,6 +2,7 @@
 import { Image } from 'astro:assets';
 import Icon from '@/components/ui/Icon.astro';
 import { hero, links } from '@/data/site';
+import { liveProjects } from '@/data/live';
 ---
 
 <section id="inicio" class="hero" aria-labelledby="hero-title" data-hero>
@@ -21,10 +22,17 @@ import { hero, links } from '@/data/site';
 					</span>
 				))}
 			</h1>
-			<p class="hero__role" data-intro data-hero-in>
-				<span class="hero__pulse" aria-hidden="true"></span>
-				{hero.role}
-			</p>
+			<div class="hero__badges" data-intro data-hero-in>
+				<p class="hero__role">
+					<span class="hero__node" aria-hidden="true"></span>
+					{hero.role}
+				</p>
+				<a class="hero__live" href="/en-vivo">
+					<span class="hero__pulse" aria-hidden="true"></span>
+					{liveProjects.length} proyectos en vivo
+					<Icon name="arrow" class="arrow" />
+				</a>
+			</div>
 			<p class="hero__tagline" data-intro data-hero-in>
 				{hero.tagline}
 			</p>
@@ -126,11 +134,55 @@ import { hero, links } from '@/data/site';
 		will-change: transform;
 	}
 
+	.hero__badges {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-3);
+		margin-top: var(--space-6);
+	}
+
+	.hero__node {
+		width: 0.5rem;
+		height: 0.5rem;
+		border-radius: 50%;
+		border: 2px solid var(--accent);
+	}
+
+	.hero__live {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-3);
+		font-family: var(--font-mono);
+		font-size: var(--text-sm);
+		color: var(--live);
+		padding: 0.35rem 0.9rem;
+		border: 1px solid color-mix(in srgb, var(--live) 40%, transparent);
+		border-radius: var(--radius-full);
+		background: color-mix(in srgb, var(--live) 8%, transparent);
+		transition:
+			background-color var(--dur-fast) ease,
+			border-color var(--dur-fast) ease;
+	}
+
+	.hero__live:hover {
+		background: color-mix(in srgb, var(--live) 16%, transparent);
+		border-color: var(--live);
+	}
+
+	.hero__live :global(.arrow) {
+		width: 0.9rem;
+		height: 0.9rem;
+		transition: transform var(--dur) var(--ease-out);
+	}
+
+	.hero__live:hover :global(.arrow) {
+		transform: translateX(3px);
+	}
+
 	.hero__role {
 		display: inline-flex;
 		align-items: center;
 		gap: var(--space-3);
-		margin-top: var(--space-6);
 		font-family: var(--font-mono);
 		font-size: var(--text-sm);
 		letter-spacing: 0.04em;
