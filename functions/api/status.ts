@@ -7,8 +7,11 @@
  * Descubrimiento opcional: si el proyecto de Pages tiene las variables CF_API_TOKEN (permiso Zone → DNS → Read)
  * y CF_ZONE_ID, también lista los CNAME de la zona y devuelve en `discovered` los subdominios públicos que aún no
  * tienen ficha. Así un subdominio nuevo aparece en /en-vivo sin tocar código.
+ *
+ * Qué NO se publica nunca (ver docs/SEGURIDAD.md): registros sin proxy de Cloudflare, nombres técnicos o sensibles
+ * (admin, staging, dev, db…), los de `liveHidden`, ni los destinos CNAME (revelarían los servidores de origen).
  */
-import { liveDomain, liveProjects, liveTargets, type Probe, type StatusPayload } from '../../src/data/live';
+import { liveDomain, liveHidden, liveProjects, liveTargets, type Probe, type StatusPayload } from '../../src/data/live';
 
 type Env = { CF_API_TOKEN?: string; CF_ZONE_ID?: string };
 type Ctx = { request: Request; env: Env; waitUntil: (p: Promise<unknown>) => void };
@@ -18,6 +21,16 @@ const CACHE_SECONDS = 30;
 
 // Subdominios técnicos que nunca son "proyectos": APIs, correo, medios, verificación, www.
 const INTERNAL = /(^|[-.])api$|api$|^www$|^r?send(\.|$)|^media(\.|$)|_|^s\d+$|^mail|^autodiscover/;
+// Nombres sensibles: nunca se anuncian aunque existan (paneles, entornos de prueba, infraestructura).
+// Se comparan palabras completas separadas por guiones: "lumacars-dev" se oculta, "devhub" o "goldemchips" no.
+const SENSITIVE = new Set(
+	(
+		'admin panel dashboard staging stage stg dev develop test testing qa uat preview sandbox internal private ' +
+		'intranet backup old legacy db database redis mongo grafana kibana monitor vpn ssh ftp smtp imap cpanel ' +
+		'webmail git ci jenkins vault auth sso login'
+	).split(' ')
+);
+const isSensitive = (sub: string): boolean => sub.split('-').some((word) => SENSITIVE.has(word));
 
 async function probe(url: string, check: 'site' | 'health' | 'reachable'): Promise<Probe> {
 	const started = Date.now();
@@ -50,12 +63,22 @@ async function discover(env: Env): Promise<{ hosts: string[]; info: StatusPayloa
 		const data = (await res.json()) as { result?: { name: string; proxied?: boolean }[] };
 		const records = data.result ?? [];
 		const known = new Set(liveTargets().map((t) => new URL(t.url).hostname));
+		const hidden = new Set(liveHidden.map((h) => h.toLowerCase()));
 		const hosts = records
-			.map((r) => r.name)
+			// Solo los que pasan por el proxy de Cloudflare: un registro en gris apunta directo a un servidor.
+			.filter((r) => r.proxied === true)
+			.map((r) => r.name.toLowerCase())
 			.filter((name) => name.endsWith(`.${liveDomain}`))
 			.filter((name) => {
 				const sub = name.slice(0, -(liveDomain.length + 1));
-				return !sub.includes('.') && !INTERNAL.test(sub) && !known.has(name);
+				return (
+					!sub.includes('.') &&
+					!INTERNAL.test(sub) &&
+					!isSensitive(sub) &&
+					!known.has(name) &&
+					!hidden.has(name) &&
+					!hidden.has(sub)
+				);
 			});
 		return { hosts, info: { state: 'on', records: records.length } };
 	} catch {
