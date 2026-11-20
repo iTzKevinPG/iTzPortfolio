@@ -7,6 +7,7 @@
  * - `data-live-count="sites|apis|down"` → contadores. `data-live-avg` → latencia media.
  * - `data-live-checked` → "hace 12 s". `data-live-refresh` → botón para comprobar ya.
  * - `data-live-discovered` (+ <template data-live-discovered-tpl>) → subdominios nuevos sin ficha.
+ * - `data-live-discovery` → estado del descubrimiento por DNS (activo / desactivado / error).
  *
  * Sin la función (p. ej. `astro dev`) todo queda en "unknown" y el texto lo explica: nunca rompe la página.
  */
@@ -70,6 +71,16 @@ export function initLive(): void {
 		document.documentElement.toggleAttribute('data-live-incident', down > 0);
 
 		renderDiscovered(data.discovered);
+		const disc = data.discovery ?? { state: 'off', records: 0 };
+		document.querySelectorAll<HTMLElement>('[data-live-discovery]').forEach((el) => {
+			el.dataset.state = disc.state;
+			el.textContent =
+				disc.state === 'on'
+					? `Activo: ${disc.records} registros revisados`
+					: disc.state === 'error'
+						? 'Sin acceso al DNS (revisa el token)'
+						: 'Desactivado';
+		});
 		checkedAt = Date.parse(data.checkedAt) || Date.now();
 		tick();
 	};
