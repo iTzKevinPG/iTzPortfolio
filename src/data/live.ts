@@ -36,6 +36,13 @@ export type LiveProject = {
 
 export const liveDomain = 'itzkevindev.tech';
 
+/**
+ * Subdominios que el descubrimiento automático nunca debe anunciar (nombre completo o solo el subdominio).
+ * Úsalo para algo en pruebas que aún no quieras mostrar. Los nombres sensibles (admin, staging, dev…) ya se
+ * filtran solos en functions/api/status.ts.
+ */
+export const liveHidden: string[] = [];
+
 export const liveProjects: LiveProject[] = [
 	{
 		id: 'goldemchips',

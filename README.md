@@ -43,6 +43,7 @@ functions/api/status.ts ← Pages Function: estado y latencia de los proyectos (
 scripts/live-shots.mjs  ← capturas de los proyectos en vivo (npm run live:shots)
 public/                 ← _headers (seguridad y caché), _redirects, robots.txt, favicon, og.jpg
 docs/BRAND.md           ← reglas de marca y cómo crear secciones, módulos y páginas
+docs/SEGURIDAD.md       ← qué expone /en-vivo, qué no, y checklist antes de sumar un proyecto
 ```
 
 Para editar textos solo hace falta tocar `src/data/site.ts`.
