@@ -156,4 +156,6 @@ export type StatusPayload = {
 	results: Record<string, { site?: Probe; api?: Probe }>;
 	/** Subdominios en DNS que aún no tienen ficha (solo si la función tiene token de Cloudflare). */
 	discovered: { host: string; site: Probe }[];
+	/** Estado del descubrimiento por DNS: off (sin token), on (leyó `records` CNAME), error (token inválido o caducado). */
+	discovery: { state: 'off' | 'on' | 'error'; records: number };
 };

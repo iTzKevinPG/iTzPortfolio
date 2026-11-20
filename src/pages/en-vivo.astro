@@ -19,7 +19,8 @@ const steps = [
 	},
 	{
 		title: 'Descubrimiento',
-		text: 'Con un token de solo lectura, la misma función revisa el DNS de la zona: un subdominio nuevo aparece aquí sin tocar código.'
+		text: 'Con un token de solo lectura, la misma función revisa el DNS de la zona: un subdominio nuevo aparece aquí sin tocar código.',
+		discovery: true
 	}
 ];
 ---
@@ -134,6 +135,12 @@ const steps = [
 						<span class="how__n">{String(i + 1).padStart(2, '0')}</span>
 						<h3>{s.title}</h3>
 						<p>{s.text}</p>
+						{'discovery' in s && (
+							<p class="how__state">
+								<span class="how__dot" aria-hidden="true" />
+								<span data-live-discovery>Comprobando…</span>
+							</p>
+						)}
 					</li>
 				))}
 			</ol>
@@ -466,6 +473,31 @@ const steps = [
 	.how__step p {
 		color: var(--text-muted);
 		font-size: var(--text-sm);
+	}
+
+	.how__state {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-2);
+		margin-top: var(--space-4);
+		font-family: var(--font-mono);
+		font-size: var(--text-xs);
+	}
+
+	.how__dot {
+		width: 0.5rem;
+		height: 0.5rem;
+		border-radius: 50%;
+		background: var(--line-strong);
+	}
+
+	.how__state:has([data-state='on']) .how__dot {
+		background: var(--live);
+		box-shadow: 0 0 8px var(--live);
+	}
+
+	.how__state:has([data-state='error']) .how__dot {
+		background: #ff5d5d;
 	}
 
 	@media (width < 900px) {

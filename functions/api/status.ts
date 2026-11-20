@@ -39,25 +39,27 @@ async function probe(url: string, check: 'site' | 'health' | 'reachable'): Promi
 	}
 }
 
-async function discover(env: Env): Promise<string[]> {
-	if (!env.CF_API_TOKEN || !env.CF_ZONE_ID) return [];
+async function discover(env: Env): Promise<{ hosts: string[]; info: StatusPayload['discovery'] }> {
+	if (!env.CF_API_TOKEN || !env.CF_ZONE_ID) return { hosts: [], info: { state: 'off', records: 0 } };
 	try {
 		const res = await fetch(
 			`https://api.cloudflare.com/client/v4/zones/${env.CF_ZONE_ID}/dns_records?type=CNAME&per_page=200`,
 			{ headers: { authorization: `Bearer ${env.CF_API_TOKEN}` }, signal: AbortSignal.timeout(TIMEOUT_MS) }
 		);
-		if (!res.ok) return [];
+		if (!res.ok) return { hosts: [], info: { state: 'error', records: 0 } };
 		const data = (await res.json()) as { result?: { name: string; proxied?: boolean }[] };
+		const records = data.result ?? [];
 		const known = new Set(liveTargets().map((t) => new URL(t.url).hostname));
-		return (data.result ?? [])
+		const hosts = records
 			.map((r) => r.name)
 			.filter((name) => name.endsWith(`.${liveDomain}`))
 			.filter((name) => {
 				const sub = name.slice(0, -(liveDomain.length + 1));
 				return !sub.includes('.') && !INTERNAL.test(sub) && !known.has(name);
 			});
+		return { hosts, info: { state: 'on', records: records.length } };
 	} catch {
-		return [];
+		return { hosts: [], info: { state: 'error', records: 0 } };
 	}
 }
 
@@ -68,7 +70,7 @@ export const onRequestGet = async (ctx: Ctx): Promise<Response> => {
 	if (hit) return hit;
 
 	const targets = liveTargets();
-	const [probes, hosts] = await Promise.all([
+	const [probes, { hosts, info }] = await Promise.all([
 		Promise.all(targets.map((t) => probe(t.url, t.check))),
 		discover(ctx.env)
 	]);
@@ -85,7 +87,8 @@ export const onRequestGet = async (ctx: Ctx): Promise<Response> => {
 	const body: StatusPayload = {
 		checkedAt: new Date().toISOString(),
 		results,
-		discovered: discovered.filter((d) => d.site.status !== 0)
+		discovered: discovered.filter((d) => d.site.status !== 0),
+		discovery: info
 	};
 
 	const res = new Response(JSON.stringify(body), {
