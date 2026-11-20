@@ -1,0 +1,56 @@
+---
+/**
+ * Fondo fijo "plano": retícula tenue + resplandor violeta que sigue al puntero (--gx/--gy los escribe
+ * motion.ts). Sustituye a los íconos flotantes de la versión Angular: una sola capa, sin imágenes.
+ */
+---
+
+<div class="backdrop" aria-hidden="true">
+	<div class="backdrop__glow" data-glow></div>
+	<div class="backdrop__grid"></div>
+</div>
+
+<style>
+	.backdrop {
+		position: fixed;
+		inset: 0;
+		z-index: var(--z-bg);
+		pointer-events: none;
+		overflow: clip;
+		background:
+			radial-gradient(90% 60% at 85% 0%, color-mix(in srgb, var(--violet-deep) 45%, transparent), transparent 70%),
+			radial-gradient(70% 50% at 0% 100%, color-mix(in srgb, var(--violet-deep) 22%, transparent), transparent 70%),
+			var(--bg);
+	}
+
+	.backdrop__grid {
+		position: absolute;
+		inset: 0;
+		--cell: 64px;
+		background-image:
+			linear-gradient(to right, color-mix(in srgb, var(--line) 55%, transparent) 1px, transparent 1px),
+			linear-gradient(to bottom, color-mix(in srgb, var(--line) 55%, transparent) 1px, transparent 1px);
+		background-size: var(--cell) var(--cell);
+		background-position: calc(50% - var(--cell) / 2) 0;
+		mask-image: radial-gradient(80% 70% at 50% 30%, black 10%, transparent 85%);
+	}
+
+	.backdrop__glow {
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 44rem;
+		height: 44rem;
+		margin: -22rem 0 0 -22rem;
+		border-radius: 50%;
+		background: radial-gradient(circle, color-mix(in srgb, var(--violet) 18%, transparent), transparent 65%);
+		transform: translate3d(var(--gx, 70vw), var(--gy, 20vh), 0);
+		will-change: transform;
+	}
+
+	@media (hover: none) {
+		.backdrop__glow {
+			display: none;
+		}
+	}
+</style>

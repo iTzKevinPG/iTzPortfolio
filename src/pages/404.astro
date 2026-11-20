@@ -1,0 +1,38 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Página no encontrada · Kevin Useche" noindex>
+	<main id="contenido" class="nf wrap">
+		<p class="nf__code">404</p>
+		<h1>Este nodo no está en el diagrama.</h1>
+		<p>La página que buscas no existe o cambió de lugar.</p>
+		<a class="btn btn--primary" href="/">
+			Volver al inicio
+		</a>
+	</main>
+</BaseLayout>
+
+<style>
+	.nf {
+		min-height: 100svh;
+		display: grid;
+		align-content: center;
+		justify-items: start;
+		gap: var(--space-6);
+	}
+
+	.nf__code {
+		font-family: var(--font-mono);
+		color: var(--live);
+	}
+
+	h1 {
+		font-size: var(--text-2xl);
+		max-width: 16ch;
+	}
+
+	p {
+		color: var(--text-muted);
+	}
+</style>

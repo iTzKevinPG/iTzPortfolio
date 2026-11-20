@@ -1,84 +1,50 @@
-# iTzPortfolio ✨
+# iTzPortfolio
 
-Road to Expose My Skills - V1.0 🚀
+Portafolio personal de Kevin Useche — [itzkevindev.tech](https://www.itzkevindev.tech).
 
-Este repositorio contiene el código de mi landing personal **itzkevindev.tech**, donde concentro mis habilidades, experiencia, proyectos destacados y enlaces de contacto.
+Sitio estático en **Astro 7**, con movimiento en **GSAP + ScrollTrigger + Lenis** y despliegue en
+**Cloudflare Pages**. Sistema de marca "Planos vivos" documentado en [`docs/BRAND.md`](docs/BRAND.md).
 
-## Características 💡
+## Scripts
 
-- **Angular 17** con Angular CLI.
-- **Diseño responsive** y UI personalizada.
-- **Automatización**: Docker multi-stage listo para CI/CD hacia DigitalOcean.
-- **Infra orientada a contenedores** para convivir con otros proyectos detrás de un reverse proxy (Traefik/Nginx).
+| Script | Qué hace |
+|---|---|
+| `npm run dev` | Servidor local en http://localhost:4321 |
+| `npm run build` | Build estático en `dist/` (genera AVIF/WebP de las imágenes) |
+| `npm run preview` | Sirve `dist/` para revisarlo |
+| `npm run check` | Chequeo de tipos de Astro y TypeScript |
+| `npm run format` | Prettier |
 
-## Scripts principales ⚙️
+Requiere Node ≥ 22.23 (`.node-version` fija 24 para Cloudflare).
 
-| Script              | Descripción                                                                 |
-| ------------------- | --------------------------------------------------------------------------- |
-| `npm start`         | Servidor local de desarrollo (`ng serve`).                                  |
-| `npm run build`     | Build estándar (SPA) usando la configuración activa en `angular.json`.      |
-| `npm run prerender` | (Opcional) compila y prerenderiza rutas SSG para pruebas locales.           |
-| `npm run build:ssg` | Alias del comando anterior.                                                 |
-| `npm run test`      | Pruebas unitarias con Karma + Jasmine.                                      |
-| `npm run lint`      | Linter mediante `@angular-eslint`.                                          |
+## Estructura
 
-## Desarrollo local 💻
-
-```bash
-npm install
-npm start
-# abre http://localhost:4200
+```
+src/
+  data/site.ts          ← TODO el contenido (textos, experiencia, proyectos, skills, enlaces)
+  assets/img/           ← imágenes fuente; Astro las optimiza al compilar (no se publican tal cual)
+  components/
+    sections/           ← una por sección de la página (Hero, About, Experience, …)
+    ui/                 ← piezas reutilizables (SectionHead, TechList, Shot, Icon, Sprite)
+    chrome/             ← fijos de la página (Backdrop, SectionNav, MotionToggle, Lightbox)
+  layouts/BaseLayout.astro  ← <head>, SEO, Open Graph, JSON-LD, carga de scripts
+  scripts/              ← motion.ts (GSAP, carga diferida), nav.ts, motion-pref.ts
+  styles/               ← tokens.css (marca) y global.css (base)
+  pages/                ← index, 404, sitemap.xml
+public/                 ← _headers (seguridad y caché), _redirects, robots.txt, favicon, og.jpg
+docs/BRAND.md           ← reglas de marca y cómo crear secciones, módulos y páginas
 ```
 
-## Docker 🐳
+Para editar textos solo hace falta tocar `src/data/site.ts`.
 
-El `Dockerfile` compila Angular (Node 20 Alpine) como SPA y sirve el contenido
-estático con Nginx 1.25 Alpine (gzip habilitado).
+## Despliegue (Cloudflare Pages)
 
-- `APP_BASE_HREF` (build arg, default `/`): ajusta el base href si se sirve bajo un subpath.
-- `PORT` (env, default `80`): puerto interno donde escucha Nginx.
-- `SERVER_NAME` (env, default `_`): se inyecta en `server_name` por si necesitas logging/host matching.
+El proyecto de Pages está conectado a GitHub: cada push a `main` publica producción y cada rama genera una
+vista previa. Configuración en el panel de Pages → *Settings → Build*:
 
-```bash
-docker build -t itzportfolio --build-arg APP_BASE_HREF=/ .
-docker run -d --rm -p 80:80 -e PORT=80 -e SERVER_NAME=itzkevindev.tech itzportfolio
-```
+- **Framework preset:** Astro
+- **Build command:** `npm run build`
+- **Build output directory:** `dist` (también declarado en `wrangler.toml`)
+- **Node:** lo toma de `.node-version`
 
-## Verificación
-
-```bash
-npm run lint
-npm run test
-npm run build -- --configuration production
-npx http-server dist/i-tz-portfolio/browser -p 4201   # smoke test estático
-```
-
-## Pipeline CI/CD 🚢
-
-### Resumen del flujo
-
-1. **Build**: `npm ci`, `npm run lint`, `npm run build -- --configuration production`.
-2. **Imagen Docker**: `docker build -t itzportfolio-nodejs .` empaqueta el SPA con Nginx.
-3. **Entrega**: la imagen se exporta (`docker save`) y se transfiere al droplet vía `scp`.
-4. **Deploy**: `appleboy/ssh-action` carga la imagen, detiene el contenedor previo y lanza `docker run -d -p 80:80 itzportfolio-nodejs`.
-
-### Secrets / variables usados
-
-| Tipo     | Nombre              | Descripción                                                                 |
-| -------- | ------------------- | --------------------------------------------------------------------------- |
-| Secret   | `DO_HOST`         | IP pública del droplet destino.                                         |
-| Secret   | `DO_SSH_USERNAME` | Usuario SSH (ej. `root` o `deploy`).                                    |
-| Secret   | `DO_SSH_KEY`      | Clave privada OpenSSH para el droplet.                                  |
-| Variable | `APP_BASE_HREF`             | Base href usado en el build (por defecto `/`).                          |
-
-### Infraestructura actual
-
-- Droplet Docker pequeño (1 vCPU / 1 GB) que expone el puerto 80.
-- Un único contenedor `itzportfolio-container` manejado por el workflow (stop/remove/run).
-- El pipeline GitHub Actions reconstruye y reemplaza ese contenedor en cada push a `main`.
-
----
-
-<p align="center">
-  <img src="IconoITzKEvin.png" alt="iTzKevin logo">
-</p>
+Cabeceras de seguridad y caché en `public/_headers`. `/home` (la URL de la versión Angular) redirige a `/`.

@@ -1,0 +1,60 @@
+---
+/** Etiquetas de tecnología: monocromo, con logo o con el nodo de la marca si no hay logo. */
+import Icon from './Icon.astro';
+import type { Tech } from '@/data/site';
+
+type Props = { items: Tech[]; label?: string };
+const { items, label = 'Tecnologías' } = Astro.props;
+---
+
+<ul class="tech" aria-label={label}>
+	{items.map((t) => (
+		<li>
+			{t.icon ? <Icon name={t.icon} /> : <span class="tech__node" aria-hidden="true" />}
+			{t.name}
+		</li>
+	))}
+</ul>
+
+<style>
+	.tech {
+		list-style: none;
+		padding: 0;
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-2);
+	}
+
+	li {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.45em;
+		padding: 0.3em 0.75em;
+		border: 1px solid var(--border);
+		border-radius: var(--radius-full);
+		font-family: var(--font-mono);
+		font-size: var(--text-xs);
+		color: var(--text-muted);
+		line-height: 1.3;
+		transition:
+			color var(--dur-fast) ease,
+			border-color var(--dur-fast) ease;
+	}
+
+	li:hover {
+		color: var(--text);
+		border-color: var(--line-strong);
+	}
+
+	li :global(svg) {
+		width: 0.95em;
+		height: 0.95em;
+	}
+
+	.tech__node {
+		width: 0.5em;
+		height: 0.5em;
+		border-radius: 50%;
+		border: 1.5px solid var(--accent);
+	}
+</style>

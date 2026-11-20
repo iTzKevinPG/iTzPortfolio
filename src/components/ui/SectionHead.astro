@@ -1,0 +1,40 @@
+---
+/** Cabecera de sección: título grande + lead opcional. Sin sobretítulos (ver docs/BRAND.md). */
+import { rich } from '@/lib/text';
+
+type Props = { title: string; lead?: string; id?: string };
+const { title, lead, id } = Astro.props;
+---
+
+<header class="head">
+	<h2 id={id} data-head>
+		<span>{title}</span>
+	</h2>
+	{lead && <p data-reveal set:html={rich(lead)} />}
+</header>
+
+<style>
+	.head {
+		display: grid;
+		gap: var(--space-4);
+		margin-bottom: var(--space-12);
+		max-width: 46rem;
+	}
+
+	h2 {
+		font-size: var(--text-2xl);
+		/* El span es la "cortina" que anima motion.ts (clip-path). */
+		overflow: clip;
+		padding-bottom: 0.08em;
+	}
+
+	h2 span {
+		display: inline-block;
+	}
+
+	p {
+		color: var(--text-muted);
+		font-size: var(--text-lg);
+		max-width: 38rem;
+	}
+</style>

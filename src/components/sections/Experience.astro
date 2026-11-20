@@ -1,0 +1,267 @@
+---
+import SectionHead from '@/components/ui/SectionHead.astro';
+import TechList from '@/components/ui/TechList.astro';
+import Shot from '@/components/ui/Shot.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { experience, links, recommendation } from '@/data/site';
+import { rich } from '@/lib/text';
+---
+
+<section id="experiencia" class="section" aria-labelledby="exp-title">
+	<div class="wrap">
+		<SectionHead
+			id="exp-title"
+			title="Experiencia"
+			lead="Del frontend a la arquitectura: más de cinco años construyendo producto."
+		/>
+
+		<div class="tl" data-timeline>
+			<span class="tl__rail" aria-hidden="true">
+				<span class="tl__fill" data-timeline-fill></span>
+			</span>
+			<ol class="tl__list">
+				{experience.map((job) => (
+					<li class:list={['tl__item', { 'tl__item--now': job.current }]} style={`--acc:${job.accent}`} data-tl-item>
+						<span class="tl__node" aria-hidden="true" />
+						<div class="tl__body" data-reveal>
+							<p class="tl__period">
+								{job.period}
+								{job.current && <span class="tl__now">actual</span>}
+							</p>
+							<h3 class="tl__title">
+								<span class="tl__company">{job.company}</span>
+								<span class="tl__role">{job.role}</span>
+							</h3>
+							{job.paragraphs.map((p) => (
+								<p class="tl__text" set:html={rich(p)} />
+							))}
+							<TechList items={job.tech} label={`Tecnologías en ${job.company}`} />
+						</div>
+						<Shot shot={job.shot} sizes="(min-width: 1100px) 480px, (min-width: 820px) 42vw, 90vw" class="tl__shot" />
+					</li>
+				))}
+			</ol>
+		</div>
+
+		<a class="rec" href={links.recommendation} target="_blank" rel="noopener" data-reveal>
+			<span class="rec__icon" aria-hidden="true">
+				<Icon name="cv" />
+			</span>
+			<span class="rec__text" set:html={rich(recommendation.text)} />
+			<span class="rec__cta">
+				{recommendation.cta} <Icon name="arrow" class="arrow" />
+			</span>
+		</a>
+	</div>
+</section>
+
+<style>
+	.tl {
+		--node: 0.875rem;
+		position: relative;
+	}
+
+	.tl__list {
+		list-style: none;
+		padding: 0;
+		display: grid;
+		gap: var(--space-24);
+	}
+
+	.tl__rail {
+		position: absolute;
+		left: calc(var(--node) / 2);
+		top: 0.5rem;
+		bottom: 0.5rem;
+		width: 2px;
+		translate: -50% 0;
+		background: var(--border);
+		border-radius: 2px;
+		overflow: clip;
+	}
+
+	/* Sin JS la línea queda completa; motion.ts la dibuja con el scroll (scaleY). */
+	.tl__fill {
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(to bottom, var(--violet), var(--violet-soft) 85%, var(--live));
+		transform-origin: top;
+	}
+
+	.tl__item {
+		position: relative;
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+		gap: var(--space-12);
+		align-items: start;
+		padding-left: calc(var(--node) + var(--space-8));
+	}
+
+	.tl__node {
+		position: absolute;
+		left: 0;
+		top: 0.35rem;
+		width: var(--node);
+		height: var(--node);
+		border-radius: 50%;
+		background: var(--ink);
+		border: 2px solid var(--line-strong);
+		transition:
+			border-color var(--dur) ease,
+			box-shadow var(--dur) ease,
+			background-color var(--dur) ease;
+	}
+
+	.tl__item.is-lit .tl__node,
+	:global(html:not(.motion)) .tl__node {
+		border-color: var(--acc);
+		background: color-mix(in srgb, var(--acc) 35%, var(--ink));
+		box-shadow: 0 0 0 5px color-mix(in srgb, var(--acc) 18%, transparent);
+	}
+
+	.tl__item--now.is-lit .tl__node {
+		animation: now 2.4s var(--ease-out) infinite;
+	}
+
+	@keyframes now {
+		70% {
+			box-shadow: 0 0 0 0.7rem transparent;
+		}
+	}
+
+	.tl__body {
+		display: grid;
+		gap: var(--space-4);
+	}
+
+	.tl__period {
+		display: flex;
+		align-items: center;
+		gap: var(--space-3);
+		font-family: var(--font-mono);
+		font-size: var(--text-sm);
+		color: var(--text-muted);
+	}
+
+	.tl__now {
+		font-size: var(--text-xs);
+		text-transform: uppercase;
+		letter-spacing: 0.12em;
+		color: var(--ink);
+		background: var(--live);
+		padding: 0.1em 0.6em;
+		border-radius: var(--radius-full);
+		font-weight: 600;
+	}
+
+	.tl__title {
+		display: grid;
+		gap: var(--space-1);
+		font-size: var(--text-xl);
+	}
+
+	.tl__company {
+		color: color-mix(in srgb, var(--acc) 75%, white);
+	}
+
+	.tl__role {
+		font-size: 0.68em;
+		font-weight: 500;
+		color: var(--text);
+		letter-spacing: -0.01em;
+	}
+
+	.tl__text {
+		color: var(--text-muted);
+		max-width: 34rem;
+	}
+
+	.tl__item :global(.tl__shot) {
+		margin-top: var(--space-8);
+	}
+
+	/* ---- Carta de recomendación ---- */
+	.rec {
+		margin-top: var(--space-24);
+		display: grid;
+		grid-template-columns: auto 1fr auto;
+		align-items: center;
+		gap: var(--space-6);
+		padding: var(--space-6) var(--space-8);
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+		background:
+			radial-gradient(120% 140% at 0% 0%, color-mix(in srgb, var(--violet-deep) 35%, transparent), transparent 60%),
+			var(--surface);
+		transition: border-color var(--dur-fast) ease;
+	}
+
+	.rec:hover {
+		border-color: var(--accent);
+	}
+
+	.rec__icon {
+		display: grid;
+		place-items: center;
+		width: 3rem;
+		height: 3rem;
+		border-radius: 50%;
+		border: 1px solid var(--line-strong);
+		color: var(--accent-text);
+	}
+
+	.rec__icon :global(svg) {
+		width: 1.3rem;
+		height: 1.3rem;
+	}
+
+	.rec__text {
+		font-family: var(--font-display);
+		font-size: var(--text-lg);
+		line-height: 1.35;
+	}
+
+	.rec__cta {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-2);
+		font-size: var(--text-sm);
+		color: var(--accent-text);
+		white-space: nowrap;
+	}
+
+	.rec__cta :global(svg) {
+		width: 1rem;
+		height: 1rem;
+		transition: transform var(--dur) var(--ease-out);
+	}
+
+	.rec:hover .rec__cta :global(svg) {
+		transform: translateX(3px);
+	}
+
+	@media (width < 820px) {
+		.tl__list {
+			gap: var(--space-16);
+		}
+
+		.tl__item {
+			grid-template-columns: 1fr;
+			gap: var(--space-6);
+			padding-left: calc(var(--node) + var(--space-4));
+		}
+
+		.tl__item :global(.tl__shot) {
+			margin-top: 0;
+		}
+
+		.rec {
+			grid-template-columns: auto 1fr;
+			padding: var(--space-6);
+		}
+
+		.rec__cta {
+			grid-column: 2;
+		}
+	}
+</style>

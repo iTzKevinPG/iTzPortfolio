@@ -1,0 +1,80 @@
+---
+/**
+ * Botón "Reducir animaciones". Guarda la elección en localStorage (MOV_KEY) y avisa a motion.ts.
+ * A propósito NO se hereda prefers-reduced-motion del sistema: la decisión es de quien visita, aquí.
+ */
+import Icon from '@/components/ui/Icon.astro';
+---
+
+<button type="button" class="mov" data-mov aria-pressed="false">
+	<Icon name="pause" class="mov__pause" />
+	<Icon name="play" class="mov__play" />
+	<span data-mov-txt>Reducir animaciones</span>
+</button>
+
+<script>
+	import { MOV_EVENT, MOV_KEY, movReducido } from '@/scripts/motion-pref';
+
+	const btns = document.querySelectorAll<HTMLButtonElement>('[data-mov]');
+	const paint = (reduced: boolean): void =>
+		btns.forEach((b) => {
+			b.setAttribute('aria-pressed', String(reduced));
+			const t = b.querySelector('[data-mov-txt]');
+			if (t) t.textContent = reduced ? 'Activar animaciones' : 'Reducir animaciones';
+		});
+
+	paint(movReducido());
+	btns.forEach((b) =>
+		b.addEventListener('click', () => {
+			const reduced = !movReducido();
+			try {
+				if (reduced) localStorage.setItem(MOV_KEY, 'reducido');
+				else localStorage.removeItem(MOV_KEY);
+			} catch {
+				/* almacenamiento bloqueado: el cambio aplica solo a esta visita */
+			}
+			paint(reduced);
+			window.dispatchEvent(new CustomEvent(MOV_EVENT, { detail: reduced }));
+		})
+	);
+</script>
+
+<style>
+	.mov {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-2);
+		padding: var(--space-2) var(--space-3);
+		border: 1px solid var(--border);
+		border-radius: var(--radius-full);
+		background: none;
+		color: var(--text-muted);
+		font-size: var(--text-sm);
+		cursor: pointer;
+		transition:
+			color var(--dur-fast) ease,
+			border-color var(--dur-fast) ease;
+	}
+
+	.mov:hover {
+		color: var(--text);
+		border-color: var(--line-strong);
+	}
+
+	.mov :global(svg) {
+		width: 0.9rem;
+		height: 0.9rem;
+	}
+
+	.mov :global(.mov__play) {
+		display: none;
+	}
+
+	:global(.mov-reducido) .mov :global(.mov__pause) {
+		display: none;
+	}
+
+	:global(.mov-reducido) .mov :global(.mov__play) {
+		display: block;
+	}
+</style>

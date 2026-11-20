@@ -1,0 +1,99 @@
+---
+import '@/styles/global.css';
+import Backdrop from '@/components/chrome/Backdrop.astro';
+import Sprite from '@/components/ui/Sprite.astro';
+import Lightbox from '@/components/chrome/Lightbox.astro';
+import { links, meta } from '@/data/site';
+
+type Props = { title?: string; description?: string; noindex?: boolean };
+const { title = meta.title, description = meta.description, noindex = false } = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = new URL('/og.jpg', Astro.site);
+const person = {
+	'@context': 'https://schema.org',
+	'@type': 'Person',
+	name: 'Kevin Useche Jiménez',
+	jobTitle: 'Software Engineer',
+	description: 'Software Engineer especializado en backend, arquitectura distribuida y cloud.',
+	url: Astro.site?.href,
+	image: ogImage.href,
+	sameAs: [links.linkedin, links.github],
+	knowsAbout: ['Node.js', 'Java', '.NET', 'Kotlin', 'Microservicios', 'Arquitectura hexagonal', 'AWS', 'Azure']
+};
+---
+
+<!doctype html>
+<html lang="es">
+	<head>
+		<meta charset="utf-8" />
+		<!-- Antes de pintar: preferencia de movimiento (clave en scripts/motion-pref.ts) y portada oculta hasta
+		     que la anime GSAP. Si el JS no llega, a los 4 s se retira `intro` y todo queda visible. -->
+		<script is:inline>
+			(function () {
+				var c = document.documentElement.classList,
+					r = false;
+				try {
+					r = localStorage.getItem('itz-movimiento') === 'reducido';
+				} catch (e) {}
+				if (r) return c.add('mov-reducido');
+				c.add('intro', 'motion');
+				setTimeout(function () {
+					if (!window.__itzMotion) c.remove('intro', 'motion');
+				}, 4000);
+			})();
+		</script>
+		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+		<meta name="theme-color" content="#0b0714" />
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<link rel="canonical" href={canonical} />
+		{noindex && <meta name="robots" content="noindex" />}
+
+		<meta property="og:type" content="profile" />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:url" content={canonical} />
+		<meta property="og:image" content={ogImage} />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta property="og:locale" content={meta.locale} />
+		<meta property="profile:first_name" content="Kevin" />
+		<meta property="profile:last_name" content="Useche" />
+		<meta name="twitter:card" content="summary_large_image" />
+
+		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+		<link rel="icon" href="/favicon.ico" sizes="32x32" />
+		<link rel="sitemap" href="/sitemap.xml" />
+		<script type="application/ld+json" set:html={JSON.stringify(person)} />
+	</head>
+	<body>
+		<a class="skip-link" href="#contenido">
+			Saltar al contenido
+		</a>
+		<Sprite />
+		<Backdrop />
+		<slot />
+		<Lightbox />
+
+		<script>
+			import { initNav } from '@/scripts/nav';
+			import { movReducido } from '@/scripts/motion-pref';
+
+			initNav();
+			// GSAP solo se descarga si el movimiento está activo (o cuando se vuelve a activar).
+			const load = (): void => {
+				void import('@/scripts/motion').then((m) => m.initMotion());
+			};
+			if (!movReducido()) load();
+			else
+				window.addEventListener(
+					'itz:movimiento',
+					(e) => {
+						if (!(e as CustomEvent<boolean>).detail) load();
+					},
+					{ once: true }
+				);
+		</script>
+	</body>
+</html>

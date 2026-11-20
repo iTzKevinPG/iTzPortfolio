@@ -1,0 +1,22 @@
+---
+/**
+ * Sprite SVG con todos los íconos que usa el sitio (los de site.ts + los de interfaz).
+ * Si añades un ícono nuevo en un componente, agrégalo a `ui`.
+ */
+import { iconPath } from '@/lib/icons';
+import { contact, experience, projects, skills } from '@/data/site';
+
+const ui = ['linkedin', 'github', 'cv', 'arrow', 'external', 'expand', 'close', 'pause', 'play'];
+const fromData = [...experience.flatMap((e) => e.tech), ...projects.flatMap((p) => p.tech), ...skills.marquee.flat()]
+	.map((t) => t.icon)
+	.filter((i): i is string => !!i);
+const names = [...new Set([...ui, ...contact.channels.map((c) => c.icon), ...fromData])];
+---
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+	{names.map((n) => (
+		<symbol id={`i-${n}`} viewBox="0 0 24 24">
+			<path d={iconPath(n)} />
+		</symbol>
+	))}
+</svg>
