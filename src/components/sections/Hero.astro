@@ -1,0 +1,353 @@
+---
+import { Image } from 'astro:assets';
+import Icon from '@/components/ui/Icon.astro';
+import { hero, links } from '@/data/site';
+---
+
+<section id="inicio" class="hero" aria-labelledby="hero-title" data-hero>
+	<div class="wrap hero__grid">
+		<div class="hero__copy">
+			<p class="hero__greet" data-intro data-hero-in>
+				{hero.greeting}
+			</p>
+			<h1 id="hero-title" class="hero__title" aria-label={hero.name.join(' ')}>
+				{hero.name.map((word) => (
+					<span class="hero__word" aria-hidden="true">
+						{[...word].map((ch) => (
+							<span class="hero__char" data-intro data-hero-char>
+								{ch}
+							</span>
+						))}
+					</span>
+				))}
+			</h1>
+			<p class="hero__role" data-intro data-hero-in>
+				<span class="hero__pulse" aria-hidden="true"></span>
+				{hero.role}
+			</p>
+			<p class="hero__tagline" data-intro data-hero-in>
+				{hero.tagline}
+			</p>
+			<div class="hero__actions" data-intro data-hero-in>
+				<a class="btn btn--primary" href={links.cv} target="_blank" rel="noopener">
+					<Icon name="cv" /> Ver CV
+				</a>
+				<a class="btn btn--icon" href={links.linkedin} target="_blank" rel="noopener" aria-label="LinkedIn">
+					<Icon name="linkedin" />
+				</a>
+				<a class="btn btn--icon" href={links.github} target="_blank" rel="noopener" aria-label="GitHub">
+					<Icon name="github" />
+				</a>
+			</div>
+		</div>
+
+		<div class="hero__visual" data-intro data-hero-visual>
+			<div class="orbit" data-tilt aria-hidden="true">
+				<span class="orbit__ring orbit__ring--1"></span>
+				<span class="orbit__ring orbit__ring--2"></span>
+				<span class="orbit__node orbit__node--a"></span>
+				<span class="orbit__node orbit__node--b"></span>
+				<span class="orbit__node orbit__node--c"></span>
+			</div>
+			<div class="hero__avatar" data-tilt-inner>
+				<Image
+					src={hero.avatar.src}
+					alt={hero.avatar.alt}
+					width={720}
+					height={720}
+					widths={[240, 360, 480, 720]}
+					sizes="(min-width: 960px) 360px, 240px"
+					format="avif"
+					quality={55}
+					loading="eager"
+					fetchpriority="high"
+				/>
+			</div>
+			<p class="hero__quote" data-intro data-hero-in>
+				“{hero.quote}”
+			</p>
+		</div>
+	</div>
+
+	<a class="hero__scroll" href="#sobre-mi" aria-label="Ir a Sobre mí" data-intro data-hero-in>
+		<span></span>
+	</a>
+</section>
+
+<style>
+	.hero {
+		position: relative;
+		min-height: 100svh;
+		display: grid;
+		align-items: center;
+		padding-block: var(--space-24) var(--space-16);
+	}
+
+	.hero__grid {
+		display: grid;
+		grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+		align-items: center;
+		gap: var(--space-12);
+	}
+
+	.hero__greet {
+		font-size: var(--text-lg);
+		color: var(--text-muted);
+		margin-bottom: var(--space-4);
+	}
+
+	.hero__copy {
+		container-type: inline-size;
+	}
+
+	.hero__title {
+		/* "Engineer" + sangría ≈ 5.3em: 18cqi garantiza que cabe en una línea en cualquier ancho. */
+		font-size: min(var(--text-hero), 18cqi);
+		font-weight: 700;
+		line-height: 0.92;
+		letter-spacing: -0.045em;
+		display: grid;
+	}
+
+	.hero__word {
+		display: block;
+		overflow: clip;
+		padding-bottom: 0.06em;
+	}
+
+	.hero__word:last-child {
+		color: var(--accent);
+		/* El segundo renglón se desplaza a la derecha: ritmo editorial, no centrado. */
+		padding-left: 0.45em;
+	}
+
+	.hero__char {
+		display: inline-block;
+		will-change: transform;
+	}
+
+	.hero__role {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-3);
+		margin-top: var(--space-6);
+		font-family: var(--font-mono);
+		font-size: var(--text-sm);
+		letter-spacing: 0.04em;
+		color: var(--text);
+		padding: 0.35rem 0.9rem;
+		border: 1px solid var(--border);
+		border-radius: var(--radius-full);
+		background: color-mix(in srgb, var(--surface) 70%, transparent);
+	}
+
+	.hero__pulse {
+		width: 0.5rem;
+		height: 0.5rem;
+		border-radius: 50%;
+		background: var(--live);
+		box-shadow: 0 0 0 0 color-mix(in srgb, var(--live) 60%, transparent);
+		animation: pulse 2.4s var(--ease-out) infinite;
+	}
+
+	@keyframes pulse {
+		70% {
+			box-shadow: 0 0 0 0.6rem transparent;
+		}
+		100% {
+			box-shadow: 0 0 0 0 transparent;
+		}
+	}
+
+	.hero__tagline {
+		margin-top: var(--space-6);
+		font-size: var(--text-lg);
+		color: var(--text-muted);
+		max-width: 30rem;
+	}
+
+	.hero__actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-3);
+		margin-top: var(--space-8);
+	}
+
+	/* ---- Visual: retrato dentro de un diagrama de nodos ---- */
+	.hero__visual {
+		position: relative;
+		display: grid;
+		place-items: center;
+		justify-self: center;
+		width: min(100%, 26rem);
+		aspect-ratio: 1;
+	}
+
+	.orbit {
+		position: absolute;
+		inset: 0;
+		transform: perspective(900px) rotateX(calc(var(--ty, 0) * 1deg)) rotateY(calc(var(--tx, 0) * 1deg));
+		transition: transform 0.6s var(--ease-out);
+	}
+
+	.orbit__ring {
+		position: absolute;
+		inset: 0;
+		border-radius: 50%;
+		border: 1px solid var(--border);
+	}
+
+	.orbit__ring--1 {
+		animation: spin 60s linear infinite;
+		border-style: dashed;
+		border-color: var(--line-strong);
+	}
+
+	.orbit__ring--2 {
+		inset: 12%;
+		border-color: color-mix(in srgb, var(--violet) 35%, transparent);
+	}
+
+	.orbit__node {
+		position: absolute;
+		width: 0.7rem;
+		height: 0.7rem;
+		border-radius: 50%;
+		background: var(--ink);
+		border: 2px solid var(--accent);
+	}
+
+	.orbit__node--a {
+		top: 12%;
+		left: 14.6%;
+	}
+
+	.orbit__node--b {
+		top: 50%;
+		right: -0.35rem;
+		border-color: var(--live);
+		box-shadow: 0 0 14px var(--live);
+	}
+
+	.orbit__node--c {
+		bottom: 3%;
+		left: 34%;
+	}
+
+	@keyframes spin {
+		to {
+			transform: rotate(360deg);
+		}
+	}
+
+	.hero__avatar {
+		position: relative;
+		width: 66%;
+		aspect-ratio: 1;
+		border-radius: 50%;
+		overflow: clip;
+		border: 1px solid var(--line-strong);
+		box-shadow:
+			0 0 0 8px color-mix(in srgb, var(--ink) 80%, transparent),
+			0 30px 80px -30px var(--violet);
+		transform: translate3d(calc(var(--tx, 0) * -0.6px), calc(var(--ty, 0) * 0.6px), 0);
+		transition: transform 0.6s var(--ease-out);
+	}
+
+	.hero__avatar img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.hero__quote {
+		position: absolute;
+		bottom: -0.5rem;
+		right: -1rem;
+		max-width: 15rem;
+		padding: var(--space-3) var(--space-4);
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+		background: color-mix(in srgb, var(--surface) 85%, transparent);
+		backdrop-filter: blur(8px);
+		font-family: var(--font-display);
+		font-size: var(--text-sm);
+		line-height: 1.35;
+		rotate: -2deg;
+	}
+
+	/* ---- Indicador de scroll ---- */
+	.hero__scroll {
+		position: absolute;
+		left: 50%;
+		bottom: var(--space-6);
+		translate: -50% 0;
+		width: 1.6rem;
+		height: 2.6rem;
+		border: 1px solid var(--line-strong);
+		border-radius: var(--radius-full);
+	}
+
+	.hero__scroll span {
+		position: absolute;
+		left: 50%;
+		top: 0.5rem;
+		width: 3px;
+		height: 0.5rem;
+		translate: -50% 0;
+		border-radius: 3px;
+		background: var(--accent);
+		animation: drop 1.8s var(--ease-in-out) infinite;
+	}
+
+	@keyframes drop {
+		60% {
+			transform: translateY(0.9rem);
+			opacity: 0;
+		}
+		100% {
+			transform: translateY(0);
+			opacity: 0;
+		}
+	}
+
+	@media (width < 960px) {
+		.hero {
+			padding-top: calc(var(--space-16) + 1rem);
+		}
+
+		.hero__grid {
+			grid-template-columns: 1fr;
+			gap: var(--space-8);
+		}
+
+		.hero__visual {
+			order: -1;
+			width: min(70vw, 17rem);
+			justify-self: start;
+		}
+
+		.hero__quote {
+			right: auto;
+			left: 78%;
+			bottom: 4%;
+			width: max-content;
+			max-width: min(44vw, 12rem);
+			font-size: var(--text-xs);
+		}
+
+		.hero__scroll {
+			display: none;
+		}
+	}
+
+	@media (width < 420px) {
+		.hero__word:last-child {
+			padding-left: 0.3em;
+		}
+
+		.hero__quote {
+			left: 62%;
+		}
+	}
+</style>

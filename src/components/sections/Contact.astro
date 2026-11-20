@@ -1,0 +1,156 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import MotionToggle from '@/components/chrome/MotionToggle.astro';
+import { contact } from '@/data/site';
+
+const year = new Date().getFullYear();
+---
+
+<section id="contacto" class="section contact" aria-labelledby="contact-title">
+	<div class="wrap">
+		<h2 id="contact-title" class="contact__title" data-head>
+			<span>{contact.title}</span>
+		</h2>
+		<p class="contact__lead" data-reveal>
+			{contact.lead}
+		</p>
+		<ul class="contact__list" data-reveal>
+			{contact.channels.map((c) => (
+				<li>
+					<a href={c.href} target="_blank" rel="noopener" class="contact__link">
+						<Icon name={c.icon} />
+						<span>{c.label}</span>
+						<Icon name="arrow" class="arrow" />
+					</a>
+				</li>
+			))}
+		</ul>
+	</div>
+</section>
+
+<footer class="foot">
+	<div class="wrap foot__row">
+		<p>© {year} Kevin Useche · Hecho con Astro</p>
+		<MotionToggle />
+	</div>
+</footer>
+
+<style>
+	.contact {
+		padding-bottom: var(--space-16);
+	}
+
+	.contact__title {
+		font-size: var(--text-hero);
+		font-weight: 700;
+		letter-spacing: -0.045em;
+		line-height: 0.95;
+		overflow: clip;
+		padding-bottom: 0.08em;
+	}
+
+	.contact__title span {
+		display: inline-block;
+	}
+
+	.contact__lead {
+		margin-top: var(--space-6);
+		max-width: 34rem;
+		font-size: var(--text-lg);
+		color: var(--text-muted);
+	}
+
+	.contact__list {
+		list-style: none;
+		padding: 0;
+		margin-top: var(--space-12);
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		border-top: 1px solid var(--border);
+	}
+
+	.contact__link {
+		display: flex;
+		align-items: center;
+		gap: var(--space-4);
+		padding: var(--space-6) var(--space-2);
+		border-bottom: 1px solid var(--border);
+		font-family: var(--font-display);
+		font-size: var(--text-xl);
+		font-weight: 500;
+		transition:
+			color var(--dur-fast) ease,
+			padding var(--dur) var(--ease-out);
+	}
+
+	.contact__link :global(svg) {
+		width: 1.4rem;
+		height: 1.4rem;
+		flex: none;
+		color: var(--text-muted);
+		transition: color var(--dur-fast) ease;
+	}
+
+	.contact__link :global(.arrow) {
+		margin-left: auto;
+		width: 1.2rem;
+		transition:
+			transform var(--dur) var(--ease-out),
+			color var(--dur-fast) ease;
+	}
+
+	.contact__link:hover {
+		color: var(--accent-text);
+		padding-left: var(--space-4);
+	}
+
+	.contact__link:hover :global(svg) {
+		color: var(--accent-text);
+	}
+
+	.contact__link:hover :global(.arrow) {
+		transform: translateX(4px) rotate(-45deg);
+		color: var(--live);
+	}
+
+	.contact__list li + li .contact__link {
+		border-left: 1px solid var(--border);
+		padding-left: var(--space-6);
+	}
+
+	.contact__list li + li .contact__link:hover {
+		padding-left: calc(var(--space-6) + var(--space-4));
+	}
+
+	.foot {
+		border-top: 1px solid var(--border);
+		padding-block: var(--space-6);
+		color: var(--text-muted);
+		font-size: var(--text-sm);
+	}
+
+	.foot__row {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--space-4);
+	}
+
+	@media (width < 760px) {
+		.contact__list {
+			grid-template-columns: 1fr;
+		}
+
+		.contact__list li + li .contact__link,
+		.contact__list li + li .contact__link:hover {
+			border-left: 0;
+			padding-left: var(--space-2);
+		}
+
+		.contact__link:hover,
+		.contact__list li + li .contact__link:hover {
+			padding-left: var(--space-4);
+		}
+	}
+</style>

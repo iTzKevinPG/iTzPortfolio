@@ -1,0 +1,173 @@
+---
+import SectionHead from '@/components/ui/SectionHead.astro';
+import TechList from '@/components/ui/TechList.astro';
+import Shot from '@/components/ui/Shot.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { projects } from '@/data/site';
+import { rich } from '@/lib/text';
+---
+
+<section id="proyectos" class="section" aria-labelledby="proj-title">
+	<div class="wrap">
+		<SectionHead
+			id="proj-title"
+			title="Proyectos"
+			lead="Lo que construyo fuera del día a día: productos propios, trabajo en equipo y laboratorio."
+		/>
+
+		<ul class="grid">
+			{projects.map((p, i) => (
+				<li class:list={['card', { 'card--featured': i === 0 }]} style={`--acc:${p.accent}`} data-card data-reveal>
+					<Shot
+						shot={p.shot}
+						sizes={
+							i === 0 ? '(min-width: 960px) 620px, 92vw' : '(min-width: 960px) 540px, (min-width: 700px) 46vw, 92vw'
+						}
+						class="card__shot"
+					/>
+					<div class="card__body">
+						<p class="card__meta">
+							<span class="card__kind">{p.kind}</span>
+							<span aria-hidden="true">·</span>
+							{p.role}
+						</p>
+						<h3 class="card__title">{p.name}</h3>
+						{p.paragraphs.map((t) => (
+							<p class="card__text" set:html={rich(t)} />
+						))}
+						<TechList items={p.tech} label={`Tecnologías de ${p.name}`} />
+						{p.href && (
+							<a class="card__link" href={p.href} target="_blank" rel="noopener">
+								Ver el código <Icon name="external" />
+							</a>
+						)}
+					</div>
+				</li>
+			))}
+		</ul>
+	</div>
+</section>
+
+<style>
+	.grid {
+		list-style: none;
+		padding: 0;
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: var(--space-6);
+	}
+
+	.card {
+		position: relative;
+		display: grid;
+		align-content: start;
+		gap: var(--space-6);
+		padding: var(--space-4);
+		border: 1px solid var(--border);
+		border-radius: calc(var(--radius) + var(--space-4) / 2);
+		background: var(--surface);
+		overflow: clip;
+		isolation: isolate;
+		transition: border-color var(--dur) ease;
+	}
+
+	/* Reflejo que sigue al cursor (motion.ts escribe --px/--py). */
+	.card::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		background: radial-gradient(
+			28rem circle at var(--px, 50%) var(--py, -20%),
+			color-mix(in srgb, var(--acc) 16%, transparent),
+			transparent 60%
+		);
+		opacity: 0;
+		transition: opacity var(--dur) ease;
+	}
+
+	.card:hover {
+		border-color: color-mix(in srgb, var(--acc) 45%, var(--border));
+	}
+
+	.card:hover::before {
+		opacity: 1;
+	}
+
+	.card__body {
+		display: grid;
+		gap: var(--space-3);
+		padding: 0 var(--space-2) var(--space-2);
+	}
+
+	.card__meta {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-2);
+		font-family: var(--font-mono);
+		font-size: var(--text-xs);
+		color: var(--text-muted);
+	}
+
+	.card__kind {
+		color: color-mix(in srgb, var(--acc) 70%, white);
+	}
+
+	.card__title {
+		font-size: var(--text-xl);
+	}
+
+	.card__text {
+		color: var(--text-muted);
+	}
+
+	.card :global(.tech) {
+		margin-top: var(--space-2);
+	}
+
+	.card__link {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-2);
+		width: fit-content;
+		margin-top: var(--space-2);
+		font-size: var(--text-sm);
+		color: var(--accent-text);
+		border-bottom: 1px solid transparent;
+		transition: border-color var(--dur-fast) ease;
+	}
+
+	.card__link:hover {
+		border-color: currentColor;
+	}
+
+	.card__link :global(svg) {
+		width: 0.9rem;
+		height: 0.9rem;
+	}
+
+	/* Proyecto destacado: ocupa las dos columnas, imagen y texto lado a lado. */
+	.card--featured {
+		grid-column: 1 / -1;
+		grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+		align-items: center;
+		gap: var(--space-8);
+	}
+
+	.card--featured .card__title {
+		font-size: var(--text-2xl);
+	}
+
+	@media (width < 960px) {
+		.card--featured {
+			grid-template-columns: 1fr;
+			gap: var(--space-6);
+		}
+	}
+
+	@media (width < 700px) {
+		.grid {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

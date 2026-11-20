@@ -1,0 +1,184 @@
+---
+import SectionHead from '@/components/ui/SectionHead.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { skills } from '@/data/site';
+---
+
+<section id="skills" class="section" aria-labelledby="skills-title">
+	<div class="wrap">
+		<SectionHead id="skills-title" title={skills.title} lead={skills.lead} />
+	</div>
+
+	<!-- Cintas: decorativas (la lista accesible es la de grupos de abajo). -->
+	<div class="belts" aria-hidden="true">
+		{skills.marquee.map((row, r) => (
+			<div class="belt" data-belt data-dir={r % 2 === 0 ? 1 : -1}>
+				<div class="belt__track" data-belt-track>
+					{[0, 1].map(() => (
+						<ul class="belt__set">
+							{row.map((t) => (
+								<li>
+									{t.icon ? <Icon name={t.icon} /> : <span class="belt__node" />}
+									{t.name}
+								</li>
+							))}
+						</ul>
+					))}
+				</div>
+			</div>
+		))}
+	</div>
+
+	<div class="wrap">
+		<div class="groups">
+			{skills.groups.map((g) => (
+				<section class="group" style={`--acc:${g.accent}`} data-reveal aria-label={g.title}>
+					<h3>
+						<span class="group__dot" aria-hidden="true" />
+						{g.title}
+					</h3>
+					<ul>
+						{g.items.map((item) => (
+							<li>{item}</li>
+						))}
+					</ul>
+				</section>
+			))}
+		</div>
+	</div>
+</section>
+
+<style>
+	/* ---- Cintas ---- */
+	.belts {
+		display: grid;
+		gap: var(--space-4);
+		margin-bottom: var(--space-16);
+		rotate: -2deg;
+		mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+	}
+
+	.belt {
+		overflow: clip;
+	}
+
+	.belt__track {
+		display: flex;
+		width: max-content;
+		will-change: transform;
+		/* Sin JS: animación CSS de respaldo. motion.ts la sustituye por una que responde al scroll. */
+		animation: belt 50s linear infinite;
+	}
+
+	.belt[data-dir='-1'] .belt__track {
+		animation-direction: reverse;
+	}
+
+	:global(html.motion) .belt__track {
+		animation: none;
+	}
+
+	@keyframes belt {
+		to {
+			transform: translateX(-50%);
+		}
+	}
+
+	.belt__set {
+		display: flex;
+		gap: var(--space-3);
+		padding: 0 var(--space-3) 0 0;
+		margin: 0;
+		list-style: none;
+	}
+
+	.belt__set li {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--space-3);
+		padding: var(--space-3) var(--space-6);
+		border: 1px solid var(--border);
+		border-radius: var(--radius-full);
+		background: var(--surface);
+		font-family: var(--font-display);
+		font-size: var(--text-lg);
+		font-weight: 500;
+		white-space: nowrap;
+		color: var(--text);
+	}
+
+	.belt__set :global(svg) {
+		width: 1.25rem;
+		height: 1.25rem;
+		color: var(--text-muted);
+	}
+
+	.belt__node {
+		width: 0.65rem;
+		height: 0.65rem;
+		border-radius: 50%;
+		border: 2px solid var(--accent);
+	}
+
+	/* ---- Grupos ---- */
+	.groups {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		border-top: 1px solid var(--border);
+	}
+
+	.group {
+		padding: var(--space-8) var(--space-6) var(--space-8) 0;
+		border-bottom: 1px solid var(--border);
+	}
+
+	.group h3 {
+		display: flex;
+		align-items: center;
+		gap: var(--space-3);
+		font-size: var(--text-lg);
+		margin-bottom: var(--space-4);
+	}
+
+	.group__dot {
+		width: 0.6rem;
+		height: 0.6rem;
+		border-radius: 50%;
+		background: var(--acc);
+		box-shadow: 0 0 12px color-mix(in srgb, var(--acc) 70%, transparent);
+	}
+
+	.group ul {
+		list-style: none;
+		padding: 0;
+		display: grid;
+		gap: var(--space-2);
+	}
+
+	.group li {
+		color: var(--text-muted);
+		font-size: var(--text-sm);
+		padding-left: calc(0.6rem + var(--space-3));
+	}
+
+	@media (width < 960px) {
+		.groups {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+
+	@media (width < 600px) {
+		.groups {
+			grid-template-columns: 1fr;
+		}
+
+		.group {
+			padding-right: 0;
+		}
+
+		.belt__set li {
+			font-size: var(--text-base);
+			padding: var(--space-2) var(--space-4);
+		}
+	}
+</style>

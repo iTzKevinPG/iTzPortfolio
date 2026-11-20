@@ -1,7 +1,7 @@
-name: CI - Build Angular App
+name: CI
 
-# El despliegue lo realiza Cloudflare Pages directamente desde GitHub.
-# Este workflow solo valida que el proyecto compile en cada push/PR.
+# El despliegue lo hace Cloudflare Pages directamente desde GitHub.
+# Este workflow valida tipos y que el sitio compile en cada push/PR.
 
 on:
   push:
@@ -13,17 +13,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Install Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version-file: .node-version
           cache: npm
 
-      - name: Install npm dependencies
-        run: npm ci
-
-      - name: Build Angular app
-        run: npm run build -- --configuration=production
+      - run: npm ci
+      - run: npm run check
+      - run: npm run build

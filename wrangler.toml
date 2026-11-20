@@ -1,0 +1,5 @@
+# Cloudflare Pages (proyecto conectado a GitHub). Con este archivo Pages toma de aquí la carpeta
+# de salida. El comando de build se configura en el panel: `npm run build`.
+name = "itzportfolio"
+compatibility_date = "2026-11-01"
+pages_build_output_dir = "./dist"

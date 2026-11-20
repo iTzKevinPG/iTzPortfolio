@@ -1,0 +1,64 @@
+---
+import { about } from '@/data/site';
+import { plain, words } from '@/lib/text';
+---
+
+<section id="sobre-mi" class="section about" aria-labelledby="about-title">
+	<div class="wrap">
+		<h2 id="about-title" class="sr-only">
+			{about.title}
+		</h2>
+		<p class="about__text" data-words>
+			<span class="sr-only">{plain(about.text)}</span>
+			<span aria-hidden="true" set:html={words(about.text)} />
+		</p>
+		<p class="about__now" data-reveal>
+			<span class="about__dot" aria-hidden="true"></span>
+			<span class="about__label">{about.now.label}</span>
+			{about.now.text}
+		</p>
+	</div>
+</section>
+
+<style>
+	.about__text {
+		font-family: var(--font-display);
+		font-size: clamp(1.6rem, 0.9rem + 2.9vw, 3.1rem);
+		font-weight: 500;
+		line-height: 1.22;
+		letter-spacing: -0.02em;
+		max-width: 22em;
+	}
+
+	.about__text :global(.hl) {
+		color: var(--accent-text);
+	}
+
+	.about__now {
+		display: inline-flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: var(--space-3);
+		margin-top: var(--space-12);
+		padding: var(--space-3) var(--space-4);
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+		color: var(--text-muted);
+	}
+
+	.about__label {
+		font-family: var(--font-mono);
+		font-size: var(--text-xs);
+		text-transform: uppercase;
+		letter-spacing: 0.12em;
+		color: var(--live);
+	}
+
+	.about__dot {
+		width: 0.5rem;
+		height: 0.5rem;
+		border-radius: 50%;
+		background: var(--live);
+		box-shadow: 0 0 10px var(--live);
+	}
+</style>

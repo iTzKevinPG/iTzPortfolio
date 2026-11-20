@@ -1,0 +1,108 @@
+---
+/**
+ * Captura de pantalla: AVIF/WebP generados al compilar, con botón para verla en grande (lightbox).
+ * `sizes` describe el ancho real en la maqueta para que el navegador baje el tamaño justo.
+ */
+import { Picture } from 'astro:assets';
+import Icon from './Icon.astro';
+import type { Shot } from '@/data/site';
+
+type Props = { shot: Shot; sizes: string; class?: string };
+const { shot, sizes, class: className } = Astro.props;
+const widths = [480, 800, 1200, 1600].filter((w) => w <= shot.src.width);
+const full = widths.at(-1) ?? shot.src.width;
+---
+
+<figure class:list={['shot', className]} data-shot>
+	<div class="shot__frame" data-shot-frame>
+		<Picture
+			src={shot.src}
+			alt={shot.alt}
+			formats={['avif']}
+			fallbackFormat="webp"
+			quality={70}
+			widths={widths}
+			sizes={sizes}
+			loading="lazy"
+			decoding="async"
+			data-shot-img
+		/>
+	</div>
+	<button type="button" class="shot__zoom" data-lightbox data-full={full} aria-label={`Ver en grande: ${shot.alt}`}>
+		<Icon name="expand" />
+	</button>
+</figure>
+
+<style>
+	.shot {
+		position: relative;
+		border-radius: var(--radius);
+		border: 1px solid var(--border);
+		background: var(--surface);
+		overflow: clip;
+		aspect-ratio: 16 / 10;
+		isolation: isolate;
+	}
+
+	.shot__frame {
+		position: absolute;
+		inset: 0;
+	}
+
+	.shot :global(picture) {
+		height: 100%;
+	}
+
+	.shot :global(img) {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: top center;
+		transform: scale(1.06);
+		transform-origin: top center;
+	}
+
+	.shot__zoom {
+		position: absolute;
+		right: var(--space-3);
+		bottom: var(--space-3);
+		display: grid;
+		place-items: center;
+		width: 2.5rem;
+		height: 2.5rem;
+		border-radius: 50%;
+		border: 1px solid var(--line-strong);
+		background: color-mix(in srgb, var(--ink) 75%, transparent);
+		backdrop-filter: blur(6px);
+		cursor: zoom-in;
+		opacity: 0;
+		transform: translateY(4px);
+		transition:
+			opacity var(--dur) ease,
+			transform var(--dur) var(--ease-out),
+			border-color var(--dur-fast) ease;
+	}
+
+	.shot__zoom svg {
+		width: 1rem;
+		height: 1rem;
+	}
+
+	.shot:hover .shot__zoom,
+	.shot__zoom:focus-visible {
+		opacity: 1;
+		transform: none;
+	}
+
+	.shot__zoom:hover {
+		border-color: var(--accent);
+	}
+
+	/* Táctil: el botón siempre visible (no hay hover). */
+	@media (hover: none) {
+		.shot__zoom {
+			opacity: 1;
+			transform: none;
+		}
+	}
+</style>
