@@ -1,7 +1,8 @@
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
-	site: 'https://www.itzkevindev.tech',
+	// Dominio principal (www todavía no apunta a Pages: ver PENDIENTES.md).
+	site: 'https://itzkevindev.tech',
 	trailingSlash: 'ignore',
 	build: { inlineStylesheets: 'auto' },
 	image: { responsiveStyles: false },

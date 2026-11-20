@@ -145,6 +145,30 @@ directamente y no trae márgenes externos (el espacio lo decide quien lo usa).
 3. Si tiene secciones, reutiliza las de `sections/` o crea nuevas con la receta de arriba.
 4. Si no debe indexarse: `<BaseLayout noindex>`.
 
+## Proyectos en vivo (`/en-vivo`)
+
+La sección estrella. Muestra los subdominios de `itzkevindev.tech` con su estado real.
+
+- **Datos:** `src/data/live.ts` (registro). Es también la **lista blanca** de la función: nunca se comprueba una
+  URL que no esté ahí.
+- **Estado:** `functions/api/status.ts` (Cloudflare Pages Function) comprueba sitio y API en paralelo, mide la
+  latencia y cachea 30 s en el borde. Las APIs con `check: 'health'` deben responder 2xx en `/health`;
+  `check: 'reachable'` acepta cualquier respuesta < 500.
+- **Pintado:** `src/scripts/live.ts` con la convención `data-live-probe="<id>:site|api"` → `data-state`
+  (`checking`, `ok`, `down`, `unknown`). Cualquier componente nuevo puede mostrar estado con solo ese atributo.
+- **Color:** lima = en línea, rojo `#ff5d5d` = sin respuesta, violeta parpadeando = comprobando. Es el único
+  sitio donde el lima aparece varias veces por pantalla: aquí "vivo" es el contenido.
+- **Descubrimiento automático (opcional):** variables `CF_API_TOKEN` (permiso Zone → DNS → Read) y `CF_ZONE_ID`
+  en el proyecto de Pages. Los CNAME nuevos aparecen como "Nodos nuevos detectados" sin tocar código.
+
+### Añadir un proyecto vivo
+
+1. Entrada en `liveProjects` (`src/data/live.ts`): `id`, `url`, `kind`, `stage`, `summary`, `detail`, `stack`,
+   `api` (si tiene) y `accent`. Si su portada abre un modal, `shotDismiss` con el selector para cerrarlo.
+2. `npm run live:shots -- <id>` → captura en `src/assets/live/<id>.jpg` (revísala).
+3. Si tiene API, que exponga `GET /health` → `{ "status": "ok" }` (patrón de las APIs NestJS de Goldem).
+4. Commit y push. El mapa, el tablero, la banda del home y el contador del hero se actualizan solos.
+
 ## Qué evitar
 
 Fondos grises · degradados de colores de marca ajenos · íconos flotando sin sentido · tarjetas anidadas ·

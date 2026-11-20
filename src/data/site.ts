@@ -39,6 +39,7 @@ export const meta = {
 export const nav = [
 	{ id: 'inicio', label: 'Inicio' },
 	{ id: 'sobre-mi', label: 'Sobre mí' },
+	{ id: 'en-vivo', label: 'En vivo' },
 	{ id: 'experiencia', label: 'Experiencia' },
 	{ id: 'proyectos', label: 'Proyectos' },
 	{ id: 'skills', label: 'Skills' },
