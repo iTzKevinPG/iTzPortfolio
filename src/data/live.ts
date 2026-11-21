@@ -32,6 +32,17 @@ export type LiveProject = {
 	accent: string;
 	/** Selector que el script de capturas pulsa antes de fotografiar (p. ej. cerrar un modal de bienvenida). */
 	shotDismiss?: string;
+	/** Crédito a quien inspiró el proyecto: se pinta como pantalla de "versus" (P1 = esta versión, P2 = la original). */
+	credit?: {
+		name: string;
+		/** Perfil de la persona. */
+		url: string;
+		/** Dónde se juega la versión original. Su captura va en src/assets/live/<id>--p2.jpg. */
+		play: string;
+		mine: string;
+		theirs: string;
+		note: string;
+	};
 };
 
 export const liveDomain = 'itzkevindev.tech';
@@ -139,7 +150,15 @@ export const liveProjects: LiveProject[] = [
 		detail:
 			'Proyecto de aprendizaje hecho por gusto. Motor propio en TypeScript: render, HUD, efectos y laboratorio de pruebas. Arte, audio y código originales.',
 		stack: [{ name: 'TypeScript', icon: 'typescript' }, { name: 'Canvas' }, { name: 'Vitest', icon: 'vitest' }],
-		accent: '#ff4d6d'
+		accent: '#ff4d6d',
+		credit: {
+			name: 'Jouler Talaigua',
+			url: 'https://www.linkedin.com/in/jouler-talaigua/',
+			play: 'https://stream-fighters.jota-dev03.workers.dev/',
+			mine: 'Pixel Edition',
+			theirs: 'Versión realista',
+			note: 'Esta edición nace de su versión realista'
+		}
 	}
 ];
 

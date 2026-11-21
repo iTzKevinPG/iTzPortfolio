@@ -7,6 +7,17 @@ import Icon from '@/components/ui/Icon.astro';
 import { liveDomain, liveProjects } from '@/data/live';
 
 const total = liveProjects.length;
+
+/*
+ * Tablero: los proyectos con crédito cierran a lo ancho. Si los normales quedan impares,
+ * el último también va a lo ancho para que ninguna tarjeta quede sola en su fila.
+ */
+const regular = liveProjects.filter((p) => !p.credit);
+const featured = liveProjects.filter((p) => p.credit);
+const board = [
+	...regular.map((p, i) => ({ p, wide: regular.length % 2 === 1 && i === regular.length - 1 })),
+	...featured.map((p) => ({ p, wide: true }))
+];
 const apis = liveProjects.filter((p) => p.api).length;
 const steps = [
 	{
@@ -102,8 +113,8 @@ const steps = [
 				<span>Proyectos</span>
 			</h2>
 			<div class="board__grid">
-				{liveProjects.map((p) => (
-					<LiveCard project={p} />
+				{board.map(({ p, wide }) => (
+					<LiveCard project={p} wide={wide} />
 				))}
 			</div>
 

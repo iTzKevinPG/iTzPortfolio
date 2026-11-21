@@ -4,66 +4,125 @@ import type { ImageMetadata } from 'astro';
 import Shot from '@/components/ui/Shot.astro';
 import TechList from '@/components/ui/TechList.astro';
 import Icon from '@/components/ui/Icon.astro';
+import { Image } from 'astro:assets';
 import type { LiveProject } from '@/data/live';
 
-type Props = { project: LiveProject };
-const { project: p } = Astro.props;
+/** `wide`: ocupa las dos columnas del tablero, con la captura a la izquierda y el texto a la derecha. */
+type Props = { project: LiveProject; wide?: boolean };
+const { project: p, wide = false } = Astro.props;
 
 const shots = import.meta.glob<{ default: ImageMetadata }>('/src/assets/live/*.jpg', { eager: true });
 const shot = shots[`/src/assets/live/${p.id}.jpg`]?.default;
+/** Captura de la versión que inspiró el proyecto (lado P2 del versus). */
+const p2shot = shots[`/src/assets/live/${p.id}--p2.jpg`]?.default;
 const host = new URL(p.url).hostname;
 const apiHost = p.api ? new URL(p.api.url) : null;
 const stageLabel = p.stage === 'produccion' ? 'En producción' : 'En construcción';
 ---
 
-<article id={`p-${p.id}`} class="lc" style={`--acc:${p.accent}`} data-card data-reveal>
+<article id={`p-${p.id}`} class:list={['lc', { 'lc--wide': wide }]} style={`--acc:${p.accent}`} data-card data-reveal>
 	{shot ? (
 		<Shot
+			class="lc__shot"
 			shot={{ src: shot, alt: `Portada de ${p.name}` }}
-			sizes="(min-width: 1100px) 520px, (min-width: 760px) 46vw, 92vw"
+			sizes={
+				wide
+					? '(min-width: 1100px) 580px, (min-width: 900px) 52vw, 92vw'
+					: '(min-width: 1100px) 520px, (min-width: 760px) 46vw, 92vw'
+			}
 		/>
 	) : (
-		<div class="lc__noshot" aria-hidden="true">
+		<div class="lc__noshot lc__shot" aria-hidden="true">
 			{host}
 		</div>
 	)}
 
 	<div class="lc__body">
-		<header class="lc__head">
-			<h3 class="lc__name">{p.name}</h3>
-			<p class="lc__tags">
-				<span class:list={['lc__stage', `lc__stage--${p.stage}`]}>{stageLabel}</span>
-				<span class="lc__kind">{p.kind}</span>
-			</p>
-		</header>
+		<div class="lc__main">
+			<header class="lc__head">
+				<h3 class="lc__name">{p.name}</h3>
+				<p class="lc__tags">
+					<span class:list={['lc__stage', `lc__stage--${p.stage}`]}>{stageLabel}</span>
+					<span class="lc__kind">{p.kind}</span>
+				</p>
+			</header>
 
-		<ul class="lc__probes">
-			<li class="probe" data-live-probe={`${p.id}:site`}>
-				<span class="probe__dot" aria-hidden="true"></span>
-				<span class="probe__name">{host}</span>
-				<span class="probe__meta">
-					<span data-live-code>—</span> <span data-live-ms></span>
-				</span>
-			</li>
-			{apiHost ? (
-				<li class="probe" data-live-probe={`${p.id}:api`}>
-					<span class="probe__dot probe__dot--api" aria-hidden="true" />
-					<span class="probe__name">API{apiHost.pathname !== '/' ? ` ${apiHost.pathname}` : ''}</span>
+			<ul class="lc__probes">
+				<li class="probe" data-live-probe={`${p.id}:site`}>
+					<span class="probe__dot" aria-hidden="true"></span>
+					<span class="probe__name">{host}</span>
 					<span class="probe__meta">
-						<span data-live-code>—</span> <span data-live-ms />
+						<span data-live-code>—</span> <span data-live-ms></span>
 					</span>
 				</li>
-			) : (
-				<li class="probe probe--none">
-					<span class="probe__dot probe__dot--none" aria-hidden="true" />
-					<span class="probe__name">Sin API: sitio estático</span>
-				</li>
-			)}
-		</ul>
+				{apiHost ? (
+					<li class="probe" data-live-probe={`${p.id}:api`}>
+						<span class="probe__dot probe__dot--api" aria-hidden="true" />
+						<span class="probe__name">API{apiHost.pathname !== '/' ? ` ${apiHost.pathname}` : ''}</span>
+						<span class="probe__meta">
+							<span data-live-code>—</span> <span data-live-ms />
+						</span>
+					</li>
+				) : (
+					<li class="probe probe--none">
+						<span class="probe__dot probe__dot--none" aria-hidden="true" />
+						<span class="probe__name">Sin API: sitio estático</span>
+					</li>
+				)}
+			</ul>
 
-		<p class="lc__summary">{p.summary}</p>
-		<p class="lc__detail">{p.detail}</p>
-		<TechList items={p.stack} label={`Stack de ${p.name}`} />
+			<p class="lc__summary">{p.summary}</p>
+			<p class="lc__detail">{p.detail}</p>
+			<TechList items={p.stack} label={`Stack de ${p.name}`} />
+		</div>
+
+		{p.credit && (
+			<section class="vs" aria-label={`${p.credit.note}: ${p.credit.name}`}>
+				<p class="vs__kicker">
+					<span class="vs__dot" aria-hidden="true"></span>
+					Origen del proyecto
+				</p>
+
+				<div class="vs__ring">
+					<div class="vs__side vs__side--p1">
+						{shot && <Image class="vs__bg vs__bg--pixel" src={shot} alt="" width={480} />}
+						<span class="vs__tag">P1</span>
+						<span class="vs__who">iTzKevin</span>
+						<span class="vs__ver">{p.credit.mine}</span>
+						<span class="vs__bar" aria-hidden="true">
+							<span></span>
+						</span>
+					</div>
+
+					<span class="vs__mark" aria-hidden="true">
+						VS
+					</span>
+
+					<div class="vs__side vs__side--p2">
+						{p2shot && <Image class="vs__bg" src={p2shot} alt="" width={480} />}
+						<span class="vs__tag">P2</span>
+						<span class="vs__who">{p.credit.name}</span>
+						<span class="vs__ver">{p.credit.theirs}</span>
+						<span class="vs__bar" aria-hidden="true">
+							<span></span>
+						</span>
+					</div>
+				</div>
+
+				<p class="vs__note">{p.credit.note}</p>
+
+				<div class="vs__actions">
+					<a class="vs__go vs__go--play" href={p.credit.play} target="_blank" rel="noopener noreferrer">
+						Jugar la versión 3D
+						<Icon name="external" />
+					</a>
+					<a class="vs__go" href={p.credit.url} target="_blank" rel="noopener noreferrer">
+						Ver su perfil
+						<Icon name="linkedin" />
+					</a>
+				</div>
+			</section>
+		)}
 
 		<a class="btn btn--primary lc__cta" href={p.url} target="_blank" rel="noopener">
 			Visitar {host.split('.')[0]}
@@ -128,6 +187,70 @@ const stageLabel = p.stage === 'produccion' ? 'En producción' : 'En construcci�
 		display: grid;
 		gap: var(--space-4);
 		padding: 0 var(--space-2) var(--space-2);
+	}
+
+	.lc__main {
+		display: grid;
+		gap: var(--space-4);
+	}
+
+	/*
+	 * Tarjeta ancha: captura a la izquierda; texto a la derecha con el botón al fondo,
+	 * a la altura del final de la captura. Si hay versus, va debajo como banda a lo ancho.
+	 */
+	.lc--wide {
+		grid-column: 1 / -1;
+	}
+
+	@media (width >= 900px) {
+		.lc--wide {
+			grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+			grid-template-rows: 1fr auto;
+			grid-template-areas:
+				'shot main'
+				'shot cta';
+			gap: var(--space-4) var(--space-8);
+		}
+
+		.lc--wide:has(.vs) {
+			grid-template-rows: 1fr auto auto;
+			grid-template-areas:
+				'shot main'
+				'shot cta'
+				'vs   vs';
+		}
+
+		.lc--wide .lc__body {
+			display: contents;
+		}
+
+		.lc--wide > :global(.lc__shot) {
+			grid-area: shot;
+			/* Sin esto la captura se estira al alto de la fila y deja el marco vacío debajo. */
+			align-self: start;
+		}
+
+		.lc--wide .lc__main {
+			grid-area: main;
+			align-content: start;
+			padding-top: var(--space-2);
+		}
+
+		.lc--wide .vs {
+			grid-area: vs;
+			margin-top: var(--space-2);
+		}
+
+		/* A lo ancho, el ring del versus gana altura para lucir las dos capturas. */
+		.lc--wide .vs__ring {
+			min-height: 12rem;
+		}
+
+		.lc--wide .lc__cta {
+			grid-area: cta;
+			align-self: end;
+			margin-top: 0;
+		}
 	}
 
 	.lc__head {
@@ -265,5 +388,322 @@ const stageLabel = p.stage === 'produccion' ? 'En producción' : 'En construcci�
 	.lc__cta {
 		justify-self: start;
 		margin-top: var(--space-2);
+	}
+
+	/* ---- Crédito: pantalla de "versus" entre esta versión y la que la inspiró ---- */
+	.vs {
+		--p1: var(--acc);
+		/* Paleta de la versión realista: ring azul y titular dorado. */
+		--p2: #5b8cff;
+		--p2-gold: #f2c45a;
+		display: grid;
+		gap: var(--space-3);
+		padding: var(--space-3);
+		border: 1px solid color-mix(in srgb, var(--p1) 30%, var(--border));
+		border-radius: var(--radius);
+		background:
+			repeating-linear-gradient(0deg, transparent 0 3px, rgb(255 255 255 / 0.025) 3px 4px),
+			color-mix(in srgb, var(--ink) 70%, transparent);
+		color: var(--text-muted);
+		font-family: var(--font-mono);
+		font-size: var(--text-xs);
+		transition:
+			border-color var(--dur) ease,
+			box-shadow var(--dur) ease;
+	}
+
+	.vs__kicker {
+		display: flex;
+		align-items: center;
+		gap: var(--space-2);
+		color: var(--p1);
+		text-transform: uppercase;
+		letter-spacing: 0.14em;
+		font-size: 0.7rem;
+		font-weight: 600;
+	}
+
+	.vs__dot {
+		width: 0.45rem;
+		height: 0.45rem;
+		border-radius: 50%;
+		background: var(--p1);
+		box-shadow: 0 0 8px var(--p1);
+		animation: vs-blink 1.2s steps(2, jump-none) infinite;
+	}
+
+	.vs__ring {
+		position: relative;
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+		min-height: 9.5rem;
+		border-radius: var(--radius-sm);
+		overflow: hidden;
+		background: var(--ink);
+	}
+
+	.vs__side {
+		position: relative;
+		isolation: isolate;
+		display: grid;
+		/* La barra va en la última fila: ambas quedan alineadas aunque un nombre ocupe dos líneas. */
+		grid-template-rows: auto auto 1fr auto;
+		align-items: start;
+		gap: 0.3rem;
+		padding: var(--space-3);
+		min-width: 0;
+		overflow: hidden;
+	}
+
+	/* Cada lado lleva su propio juego de fondo, velado hacia el centro y hacia abajo. */
+	.vs__bg {
+		position: absolute;
+		inset: 0;
+		z-index: -2;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: 50% 50%;
+		opacity: 0.6;
+		/* Acercamiento leve, centrado en los peleadores de ambas capturas. */
+		transform: scale(var(--zoom, 1.1));
+		transform-origin: var(--focus, 50% 55%);
+		transition:
+			opacity var(--dur) ease,
+			transform 0.8s var(--ease-out);
+	}
+
+	.vs__bg--pixel {
+		image-rendering: pixelated;
+	}
+
+	.vs__side::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+	}
+
+	.vs__side--p1 {
+		justify-items: start;
+	}
+
+	.vs__side--p1::after {
+		background:
+			linear-gradient(90deg, color-mix(in srgb, var(--p1) 30%, transparent), transparent 70%),
+			linear-gradient(180deg, color-mix(in srgb, var(--ink) 85%, transparent), transparent 70%),
+			linear-gradient(0deg, var(--ink), transparent 40%), linear-gradient(270deg, var(--ink), transparent 55%);
+	}
+
+	.vs__side--p2 {
+		justify-items: end;
+		text-align: right;
+	}
+
+	.vs__side--p2::after {
+		background:
+			linear-gradient(270deg, color-mix(in srgb, var(--p2) 35%, transparent), transparent 70%),
+			linear-gradient(180deg, color-mix(in srgb, var(--ink) 85%, transparent), transparent 70%),
+			linear-gradient(0deg, var(--ink), transparent 40%), linear-gradient(90deg, var(--ink), transparent 55%);
+	}
+
+	.vs__tag {
+		padding: 0.1em 0.5em;
+		border-radius: 3px;
+		background: var(--p1);
+		color: var(--ink);
+		font-weight: 700;
+		letter-spacing: 0.06em;
+	}
+
+	.vs__side--p2 .vs__tag {
+		background: var(--p2);
+	}
+
+	.vs__who {
+		color: var(--text);
+		font-family: var(--font-display);
+		font-size: var(--text-base);
+		font-weight: 700;
+		line-height: 1.15;
+		text-wrap: balance;
+		text-shadow: 0 2px 10px var(--ink);
+	}
+
+	.vs__ver {
+		color: var(--text);
+		font-size: 0.7rem;
+		opacity: 0.85;
+		text-shadow: 0 1px 6px var(--ink);
+	}
+
+	.vs__side--p2 .vs__ver {
+		color: var(--p2-gold);
+		opacity: 1;
+	}
+
+	/* Barras de vida: la de P1 se vacía hacia el centro, como en el género. */
+	.vs__bar {
+		width: 100%;
+		height: 6px;
+		padding: 1px;
+		border: 1px solid var(--line-strong);
+		border-radius: 2px;
+		background: var(--ink-3);
+	}
+
+	.vs__bar > span {
+		display: block;
+		height: 100%;
+	}
+
+	.vs__side--p1 .vs__bar > span {
+		background: linear-gradient(270deg, var(--spark), var(--p1));
+		transform-origin: right;
+	}
+
+	.vs__side--p2 .vs__bar > span {
+		background: linear-gradient(90deg, var(--p2-gold), var(--p2));
+		transform-origin: left;
+	}
+
+	.vs__mark {
+		position: relative;
+		z-index: 1;
+		display: grid;
+		place-items: center;
+		padding: 0 var(--space-2);
+		color: var(--text);
+		font-family: var(--font-display);
+		font-size: 2rem;
+		font-style: italic;
+		font-weight: 700;
+		letter-spacing: -0.06em;
+		text-shadow:
+			-2px -2px 0 var(--p1),
+			2px 2px 0 var(--p2);
+	}
+
+	/* Rayo diagonal que parte el ring en dos. */
+	.vs__mark::before {
+		content: '';
+		position: absolute;
+		top: -30%;
+		bottom: -30%;
+		left: 50%;
+		z-index: -1;
+		width: 2px;
+		background: linear-gradient(transparent, var(--text) 50%, transparent);
+		opacity: 0.45;
+		transform: rotate(16deg);
+	}
+
+	.vs__actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-2);
+	}
+
+	.vs__go {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5em;
+		padding: 0.45em 0.85em;
+		border: 1px solid var(--border);
+		border-radius: var(--radius-full);
+		color: var(--text);
+		font-weight: 600;
+		text-decoration: none;
+		white-space: nowrap;
+		transition:
+			border-color var(--dur-fast) ease,
+			background-color var(--dur-fast) ease;
+	}
+
+	.vs__go--play {
+		border-color: color-mix(in srgb, var(--p2) 55%, transparent);
+		background: color-mix(in srgb, var(--p2) 14%, transparent);
+	}
+
+	/* <Icon> es otro componente: el estilo con scope no le llega sin :global. */
+	.vs__go :global(svg) {
+		width: 0.95rem;
+		height: 0.95rem;
+		transition: transform var(--dur) var(--ease-out);
+	}
+
+	.vs__go:hover,
+	.vs__go:focus-visible {
+		border-color: var(--p2);
+		background: color-mix(in srgb, var(--p2) 24%, transparent);
+	}
+
+	.vs__go:hover :global(svg),
+	.vs__go:focus-visible :global(svg) {
+		transform: translateX(2px) rotate(-6deg);
+	}
+
+	/* Al entrar al bloque: el VS golpea, las barras se recargan y los fondos se acercan. */
+	.vs:hover,
+	.vs:focus-within {
+		border-color: color-mix(in srgb, var(--p1) 50%, var(--p2));
+		box-shadow: 0 12px 40px -18px var(--p2);
+	}
+
+	.vs:hover .vs__mark,
+	.vs:focus-within .vs__mark {
+		animation: vs-punch 0.45s var(--ease-out);
+	}
+
+	.vs:hover .vs__bar > span,
+	.vs:focus-within .vs__bar > span {
+		animation: vs-charge 0.6s steps(8, end);
+	}
+
+	.vs:hover .vs__bg,
+	.vs:focus-within .vs__bg {
+		opacity: 0.85;
+		transform: scale(calc(var(--zoom, 1.1) * 1.05));
+	}
+
+	@keyframes vs-blink {
+		50% {
+			opacity: 0.2;
+		}
+	}
+
+	@keyframes vs-punch {
+		0% {
+			transform: scale(1.6) rotate(-8deg);
+			opacity: 0;
+		}
+		60% {
+			transform: scale(0.92);
+			opacity: 1;
+		}
+		100% {
+			transform: scale(1);
+		}
+	}
+
+	@keyframes vs-charge {
+		from {
+			transform: scaleX(0);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.vs__dot,
+		.vs:hover .vs__mark,
+		.vs:focus-within .vs__mark,
+		.vs:hover .vs__bar > span,
+		.vs:focus-within .vs__bar > span {
+			animation: none;
+		}
+
+		.vs:hover .vs__bg,
+		.vs:focus-within .vs__bg {
+			transform: scale(var(--zoom, 1.1));
+		}
 	}
 </style>

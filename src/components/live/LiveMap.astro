@@ -6,7 +6,12 @@
  *
  * Dos composiciones calculadas al compilar: horizontal (escritorio) y vertical (móvil), para que las
  * etiquetas sigan legibles en pantallas pequeñas.
+ *
+ * Con `linked`, tocar un nodo abre una ficha flotante junto a él (estado, resumen y enlaces) en vez de
+ * saltar a la tarjeta: así en móvil no se pierde el punto de la página. Sin JS, el enlace sigue llevando
+ * a la tarjeta.
  */
+import Icon from '@/components/ui/Icon.astro';
 import { liveDomain, liveProjects } from '@/data/live';
 
 type Props = { compact?: boolean; linked?: boolean; class?: string };
@@ -83,7 +88,14 @@ function build(l: Layout) {
 				</g>
 
 				{nodes.map((n) => (
-					<Wrap href={linked ? `/en-vivo#p-${n.p.id}` : undefined} class="lm__link" style={`--acc:${n.p.accent}`}>
+					<Wrap
+						href={linked ? `/en-vivo#p-${n.p.id}` : undefined}
+						class="lm__link"
+						style={`--acc:${n.p.accent}`}
+						data-lm-node={linked ? n.p.id : undefined}
+						aria-haspopup={linked ? 'dialog' : undefined}
+						aria-controls={linked ? `lm-tip-${n.p.id}` : undefined}
+					>
 						<title>{n.p.name}</title>
 						{n.p.api && (
 							<g class="lm__api" data-live-probe={`${n.p.id}:api`}>
@@ -128,7 +140,154 @@ function build(l: Layout) {
 			</svg>
 		);
 	})}
+
+	{linked &&
+		liveProjects.map((p) => {
+			const host = new URL(p.url).hostname;
+			const apiPath = p.api ? new URL(p.api.url).pathname : '';
+			return (
+				<div
+					id={`lm-tip-${p.id}`}
+					class="tip"
+					role="dialog"
+					aria-label={`${p.name}: resumen`}
+					tabindex="-1"
+					style={`--acc:${p.accent}`}
+					data-lm-tip={p.id}
+					hidden
+				>
+					<div class="tip__head">
+						<p class="tip__name">{p.name}</p>
+						<button type="button" class="tip__close" aria-label="Cerrar" data-lm-close>
+							<Icon name="close" />
+						</button>
+					</div>
+					<p class="tip__tags">
+						<span class:list={['tip__stage', `tip__stage--${p.stage}`]}>
+							{p.stage === 'produccion' ? 'En producción' : 'En construcción'}
+						</span>
+						<span>{p.kind}</span>
+					</p>
+
+					<ul class="tip__probes">
+						<li data-live-probe={`${p.id}:site`}>
+							<span class="tip__dot" aria-hidden="true" />
+							<span class="tip__probe-name">Sitio</span>
+							<span class="tip__meta">
+								<span data-live-code>—</span> <span data-live-ms />
+							</span>
+						</li>
+						{p.api ? (
+							<li data-live-probe={`${p.id}:api`}>
+								<span class="tip__dot tip__dot--api" aria-hidden="true" />
+								<span class="tip__probe-name">API{apiPath !== '/' ? ` ${apiPath}` : ''}</span>
+								<span class="tip__meta">
+									<span data-live-code>—</span> <span data-live-ms />
+								</span>
+							</li>
+						) : (
+							<li class="tip__none">
+								<span class="tip__dot tip__dot--none" aria-hidden="true" />
+								<span class="tip__probe-name">Sin API: sitio estático</span>
+							</li>
+						)}
+					</ul>
+
+					<p class="tip__summary">{p.summary}</p>
+
+					<div class="tip__actions">
+						<a class="tip__btn tip__btn--main" href={p.url} target="_blank" rel="noopener">
+							Visitar {host.split('.')[0]}
+							<Icon name="external" />
+						</a>
+						<a class="tip__btn" href={`#p-${p.id}`} data-lm-goto>
+							Ver ficha
+							<Icon name="arrow" class="tip__down" />
+						</a>
+					</div>
+				</div>
+			);
+		})}
 </div>
+
+<script>
+	/*
+	 * Ficha flotante del mapa: un solo nodo abierto a la vez, colocada encima del nodo (o debajo si no
+	 * cabe), sin desbordar el ancho del mapa. Se cierra con Esc, tocando fuera o el mismo nodo.
+	 */
+	const GAP = 14;
+	const EDGE = 8;
+	const TOP_SAFE = 80; // barra superior fija
+
+	document.querySelectorAll<HTMLElement>('[data-live-map]').forEach((map) => {
+		let open: { tip: HTMLElement; node: SVGElement } | null = null;
+
+		const place = (): void => {
+			if (!open) return;
+			const { tip, node } = open;
+			const dot = node.querySelector('.lm__node') ?? node;
+			const box = map.getBoundingClientRect();
+			const r = dot.getBoundingClientRect();
+			const tw = tip.offsetWidth;
+			const th = tip.offsetHeight;
+			const cx = r.left + r.width / 2 - box.left;
+			const x = Math.min(Math.max(cx - tw / 2, EDGE), Math.max(EDGE, box.width - tw - EDGE));
+			const fitsAbove = r.top - th - GAP > TOP_SAFE;
+			const fitsBelow = r.bottom + th + GAP < window.innerHeight;
+			const above = fitsAbove || !fitsBelow;
+			tip.style.left = `${x}px`;
+			tip.style.top = `${above ? r.top - box.top - th - GAP : r.bottom - box.top + GAP}px`;
+			tip.style.setProperty('--arrow-x', `${Math.min(Math.max(cx - x, 18), tw - 18)}px`);
+			tip.dataset.side = above ? 'top' : 'bottom';
+		};
+
+		const close = (focusNode = false): void => {
+			if (!open) return;
+			const { tip, node } = open;
+			tip.hidden = true;
+			node.classList.remove('is-active');
+			node.setAttribute('aria-expanded', 'false');
+			if (focusNode) (node as unknown as HTMLElement).focus();
+			open = null;
+		};
+
+		const show = (node: SVGElement): void => {
+			const id = node.dataset.lmNode;
+			const tip = map.querySelector<HTMLElement>(`[data-lm-tip="${id}"]`);
+			if (!tip) return;
+			const same = open?.tip === tip;
+			close();
+			if (same) return;
+			open = { tip, node };
+			tip.hidden = false;
+			node.classList.add('is-active');
+			node.setAttribute('aria-expanded', 'true');
+			place();
+			tip.focus({ preventScroll: true });
+		};
+
+		map.querySelectorAll<SVGElement>('[data-lm-node]').forEach((node) =>
+			node.addEventListener('click', (e) => {
+				e.preventDefault();
+				show(node);
+			})
+		);
+
+		map.querySelectorAll<HTMLElement>('[data-lm-close]').forEach((b) => b.addEventListener('click', () => close(true)));
+		map.querySelectorAll<HTMLElement>('[data-lm-goto]').forEach((a) => a.addEventListener('click', () => close()));
+
+		document.addEventListener('click', (e) => {
+			if (!open) return;
+			const t = e.target as Node;
+			if (open.tip.contains(t) || open.node.contains(t)) return;
+			close();
+		});
+		document.addEventListener('keydown', (e) => {
+			if (e.key === 'Escape') close(true);
+		});
+		window.addEventListener('resize', place);
+	});
+</script>
 
 <style>
 	.lm {
@@ -319,5 +478,288 @@ function build(l: Layout) {
 			opacity: 0;
 			transform: scale(1.9);
 		}
+	}
+
+	/* ---- Nodo abierto ---- */
+	.lm__link {
+		cursor: pointer;
+	}
+
+	.lm__link.is-active .lm__node {
+		stroke: var(--acc);
+		stroke-width: 3;
+	}
+
+	.lm__link.is-active .lm__label {
+		fill: var(--acc);
+	}
+
+	.lm__link:focus-visible .lm__node {
+		stroke: var(--violet-soft);
+		stroke-width: 3;
+	}
+
+	/* ---- Ficha flotante ---- */
+	.tip {
+		position: absolute;
+		z-index: 5;
+		width: min(19rem, calc(100% - 1rem));
+		display: grid;
+		gap: var(--space-3);
+		padding: var(--space-4);
+		border: 1px solid color-mix(in srgb, var(--acc) 45%, var(--border));
+		border-radius: var(--radius);
+		background: color-mix(in srgb, var(--surface) 92%, transparent);
+		backdrop-filter: blur(12px);
+		box-shadow:
+			0 18px 50px -20px rgb(0 0 0 / 0.8),
+			0 0 0 1px rgb(255 255 255 / 0.03) inset;
+		transform-origin: var(--arrow-x, 50%) 100%;
+		animation: tip-in 0.22s var(--ease-out);
+	}
+
+	.tip[hidden] {
+		display: none;
+	}
+
+	.tip[data-side='bottom'] {
+		transform-origin: var(--arrow-x, 50%) 0%;
+	}
+
+	.tip:focus {
+		outline: none;
+	}
+
+	/* Franja con el color del proyecto y flecha hacia el nodo. */
+	.tip::before {
+		content: '';
+		position: absolute;
+		inset: 0 0 auto;
+		height: 3px;
+		border-radius: var(--radius) var(--radius) 0 0;
+		background: var(--acc);
+	}
+
+	.tip::after {
+		content: '';
+		position: absolute;
+		left: var(--arrow-x, 50%);
+		bottom: -6px;
+		width: 10px;
+		height: 10px;
+		translate: -50% 0;
+		rotate: 45deg;
+		background: var(--surface);
+		border-right: 1px solid color-mix(in srgb, var(--acc) 45%, var(--border));
+		border-bottom: 1px solid color-mix(in srgb, var(--acc) 45%, var(--border));
+	}
+
+	/* Abierta hacia abajo, la flecha nace de la franja de color: se pinta igual. */
+	.tip[data-side='bottom']::after {
+		top: -6px;
+		bottom: auto;
+		rotate: 225deg;
+		background: var(--acc);
+		border-color: var(--acc);
+	}
+
+	@keyframes tip-in {
+		from {
+			opacity: 0;
+			transform: scale(0.94) translateY(4px);
+		}
+	}
+
+	:global(.mov-reducido) .tip {
+		animation: none;
+	}
+
+	.tip__head {
+		display: flex;
+		align-items: start;
+		justify-content: space-between;
+		gap: var(--space-2);
+	}
+
+	.tip__name {
+		font-family: var(--font-display);
+		font-size: var(--text-lg);
+		font-weight: 700;
+		line-height: 1.15;
+		color: var(--text);
+	}
+
+	.tip__close {
+		flex: none;
+		display: grid;
+		place-items: center;
+		width: 1.9rem;
+		height: 1.9rem;
+		margin: -0.3rem -0.4rem 0 0;
+		border: 0;
+		border-radius: 50%;
+		background: none;
+		color: var(--text-muted);
+		cursor: pointer;
+		transition:
+			background-color var(--dur-fast) ease,
+			color var(--dur-fast) ease;
+	}
+
+	.tip__close:hover,
+	.tip__close:focus-visible {
+		background: var(--surface-hi);
+		color: var(--text);
+	}
+
+	.tip__close :global(svg) {
+		width: 1rem;
+		height: 1rem;
+	}
+
+	.tip__tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-2);
+		margin-top: calc(var(--space-2) * -1);
+		font-family: var(--font-mono);
+		font-size: 0.72rem;
+		color: var(--text-muted);
+	}
+
+	.tip__tags > span {
+		padding: 0.15em 0.6em;
+		border: 1px solid var(--border);
+		border-radius: var(--radius-full);
+	}
+
+	.tip__tags > .tip__stage--produccion {
+		color: var(--ink);
+		background: var(--live);
+		border-color: var(--live);
+		font-weight: 600;
+	}
+
+	.tip__tags > .tip__stage--construccion {
+		color: var(--accent-text);
+		border-color: color-mix(in srgb, var(--violet) 45%, transparent);
+	}
+
+	.tip__probes {
+		list-style: none;
+		display: grid;
+		gap: 0.35rem;
+		padding: var(--space-2) var(--space-3);
+		border: 1px solid var(--border);
+		border-radius: var(--radius-sm);
+		background: color-mix(in srgb, var(--ink) 60%, transparent);
+		font-family: var(--font-mono);
+		font-size: 0.72rem;
+	}
+
+	.tip__probes li {
+		display: grid;
+		grid-template-columns: auto minmax(0, 1fr) auto;
+		align-items: center;
+		gap: var(--space-2);
+	}
+
+	.tip__probe-name {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		color: var(--text);
+	}
+
+	.tip__none .tip__probe-name,
+	.tip__meta {
+		color: var(--text-muted);
+	}
+
+	.tip__dot {
+		width: 0.5rem;
+		height: 0.5rem;
+		border-radius: 50%;
+		background: var(--line-strong);
+	}
+
+	.tip__dot--api {
+		border-radius: 2px;
+	}
+
+	.tip__dot--none {
+		background: none;
+		border: 1.5px dashed var(--line-strong);
+	}
+
+	[data-state='ok'] > .tip__dot {
+		background: var(--live);
+		box-shadow: 0 0 8px var(--live);
+	}
+
+	[data-state='ok'] [data-live-code] {
+		color: var(--live);
+	}
+
+	[data-state='down'] > .tip__dot {
+		background: #ff5d5d;
+		box-shadow: 0 0 8px #ff5d5d;
+	}
+
+	[data-state='down'] [data-live-code] {
+		color: #ff8a8a;
+	}
+
+	.tip__summary {
+		font-size: var(--text-sm);
+		line-height: 1.5;
+		color: var(--text-muted);
+	}
+
+	.tip__actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--space-2);
+	}
+
+	.tip__btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.45em;
+		padding: 0.5em 0.9em;
+		border: 1px solid var(--border);
+		border-radius: var(--radius-full);
+		color: var(--text);
+		font-size: var(--text-sm);
+		font-weight: 600;
+		text-decoration: none;
+		white-space: nowrap;
+		transition:
+			border-color var(--dur-fast) ease,
+			background-color var(--dur-fast) ease;
+	}
+
+	.tip__btn--main {
+		border-color: var(--violet);
+		background: var(--violet-deep);
+	}
+
+	.tip__btn:hover,
+	.tip__btn:focus-visible {
+		border-color: var(--acc);
+	}
+
+	.tip__btn--main:hover,
+	.tip__btn--main:focus-visible {
+		background: color-mix(in srgb, var(--violet-deep) 70%, var(--violet));
+	}
+
+	.tip__btn :global(svg) {
+		width: 0.9rem;
+		height: 0.9rem;
+	}
+
+	.tip__btn :global(.tip__down) {
+		rotate: 90deg;
 	}
 </style>
