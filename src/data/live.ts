@@ -78,7 +78,7 @@ export const liveProjects: LiveProject[] = [
 		name: 'LUMAcars',
 		url: 'https://lumacars.itzkevindev.tech',
 		kind: 'Cliente',
-		stage: 'construccion',
+		stage: 'produccion',
 		summary: 'Compra-venta de vehículos en España: catálogo, ficha por coche y panel para publicar lotes.',
 		detail: 'Portada con carril horizontal fijado al scroll, panel de administración propio y fotos servidas desde R2.',
 		stack: [
